@@ -29,6 +29,24 @@ function Final() {
   const audioRef = useRef(null);
   const [starImg, setStarImg] = React.useState(star1);
   const handleBack = () => navigate("/wonderworld");
+  const starLayout =
+    starImg === star1
+      ? {
+          width: { lg: "300px", sm: "200px" },
+          marginLeft: { lg: "857px", sm: "54%" },
+          marginTop: { lg: "-53.5%", sm: "-67%" },
+        }
+      : starImg === star2
+      ? {
+          width: { lg: "290px", sm: "195px" },
+          marginLeft: { lg: "846px", sm: "55%" },
+          marginTop: { lg: "-47.8%", sm: "-63%" },
+        }
+      : {
+          width: { lg: "300px", sm: "200px" },
+          marginLeft: { lg: "852px", sm: "55.5%" },
+          marginTop: { lg: "-49.5%", sm: "-65%" },
+        };
 
   useEffect(() => {
     let voiceKey = "cookie_voice_tries";
@@ -222,10 +240,11 @@ function Final() {
             src={starImg}
             className="star-animate"
             sx={{
-              width: { lg: "300px", sm: "200px" },
-              height: { lg: "300px", sm: "200px" },
-              marginLeft: { lg: "852px", sm: "55.5%" },
-              marginTop: { lg: "-49.5%", sm: "-65%" },
+              width: starLayout.width,
+              height: "auto",
+              objectFit: "contain",
+              marginLeft: starLayout.marginLeft,
+              marginTop: starLayout.marginTop,
             }}
           />
 

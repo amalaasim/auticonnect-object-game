@@ -178,7 +178,7 @@ function Find() {
     const goNext = () => {
       if (didNavigate) return;
       didNavigate = true;
-      navigate("/final", { state: { from: "findball" } });
+      navigate("/final", { state: { from: "find" } });
     };
 
     if (navigateTimeoutRef.current) {

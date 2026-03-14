@@ -26,97 +26,220 @@ export default function Car() {
 const audioRef = useRef(null);
 const recognitionRef = useRef(null);
 const retryListenRef = useRef(null);
+const listenTimeoutRef = useRef(null);
+const cancelListenRef = useRef(false);
+const allowListeningRef = useRef(true);
+const startListeningRef = useRef(null);
 const [speechVerified, setSpeechVerified] = React.useState(false);
 const [speechStatus, setSpeechStatus] = React.useState("");
 const speechVerifiedRef = useRef(false);
-
-   useEffect(() => {
-  const audio = audioRef.current;
-  if (audio) {
-    audio.pause();
-    audio.currentTime = 0;
-    audio.volume = 1;
+const playAndWait = (audio) => {
+  return new Promise((resolve) => {
+    if (!audio) {
+      resolve();
+      return;
+    }
+    audio.onended = () => resolve();
     audio.play().catch(() => {
       setTimeout(() => {
         audio.play().catch(() => console.log("Autoplay blocked"));
       }, 1000);
     });
-  }
-}, [i18n.language]);
+  });
+};
 
 useEffect(() => {
   speechVerifiedRef.current = speechVerified;
 }, [speechVerified]);
 
 useEffect(() => {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!speechVerified) return;
+  const timeoutId = setTimeout(() => {
+    navigate("/findcar");
+  }, 800);
 
-  if (!SpeechRecognition) {
-    setSpeechStatus("Speech recognition not supported on this device.");
-    return;
-  }
+  return () => clearTimeout(timeoutId);
+}, [speechVerified, navigate]);
 
-  const recognition = new SpeechRecognition();
-  recognition.lang = i18n.language === "ur" ? "ur-PK" : "en-US";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  recognition.continuous = false;
+useEffect(() => {
+  const listenForCar = () =>
+    new Promise((resolve, reject) => {
+      let resolved = false;
+      cancelListenRef.current = false;
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  const startListening = () => {
-    if (retryListenRef.current) {
-      clearTimeout(retryListenRef.current);
-      retryListenRef.current = null;
-    }
+      if (!SpeechRecognition) {
+        setSpeechStatus("Speech recognition not supported on this device.");
+        reject(new Error("SpeechRecognition not supported"));
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = i18n.language === "ur" ? "ur-PK" : "en-US";
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 5;
+      recognition.continuous = false;
+
+      const finishAsVerified = (status) => {
+        if (resolved) return;
+        resolved = true;
+        setSpeechVerified(true);
+        speechVerifiedRef.current = true;
+        setSpeechStatus(status);
+        if (listenTimeoutRef.current) {
+          clearTimeout(listenTimeoutRef.current);
+          listenTimeoutRef.current = null;
+        }
+        try {
+          recognition.stop();
+        } catch (_) {}
+        resolve();
+      };
+
+      const startListening = () => {
+        if (retryListenRef.current) {
+          clearTimeout(retryListenRef.current);
+          retryListenRef.current = null;
+        }
+        if (listenTimeoutRef.current) {
+          clearTimeout(listenTimeoutRef.current);
+          listenTimeoutRef.current = null;
+        }
+        setSpeechVerified(false);
+        setSpeechStatus("Listening… say “car”");
+        listenTimeoutRef.current = setTimeout(() => {
+          finishAsVerified("Continuing...");
+        }, 5000);
+        try {
+          recognition.start();
+        } catch (_) {
+          // Ignore duplicate starts
+        }
+      };
+      startListeningRef.current = startListening;
+
+      recognition.onresult = (event) => {
+        const transcripts = Array.from(event.results || []).flatMap((result) =>
+          Array.from(result || []).map((item) => item.transcript.toLowerCase())
+        );
+        const transcript = transcripts[0] || "";
+        setSpeechStatus(`Heard: ${transcript}`);
+        const exactVariants = [
+          "car",
+          "cars",
+          "carr",
+          "care",
+          "cur",
+          "kar",
+          "kaar",
+          "gari",
+          "gaari",
+          "گاڑی",
+          "گاڑي",
+        ];
+        const matches = transcripts.some((value) => {
+          const normalized = value.replace(/[\s\-_.']/g, "");
+          const words = value
+            .split(/\s+/)
+            .map((word) => word.replace(/[^a-z\u0600-\u06ff]/gi, "").toLowerCase())
+            .filter(Boolean);
+
+          if (
+            exactVariants.some(
+              (variant) =>
+                normalized.includes(variant) || words.includes(variant)
+            )
+          ) {
+            return true;
+          }
+
+          return words.some((word) => {
+            if (word.length > 5) return false;
+            if (/^[ck].*(r|re|rr)$/.test(word)) return true;
+            if (/^ca/.test(word)) return true;
+            if (/^ka/.test(word)) return true;
+            if (/^gar/i.test(word)) return true;
+            return false;
+          });
+        });
+
+        if (matches) {
+          finishAsVerified("Great! You said car.");
+        } else {
+          setSpeechVerified(false);
+          speechVerifiedRef.current = false;
+          setSpeechStatus("Try again: say “car”.");
+        }
+      };
+
+      recognition.onerror = (event) => {
+        const error = event?.error || "unknown";
+        if (error === "aborted") return;
+        if (error === "no-speech") {
+          setSpeechStatus("No speech detected. Try again.");
+        } else if (error === "audio-capture") {
+          setSpeechStatus("Microphone not available.");
+        } else if (error === "not-allowed") {
+          setSpeechStatus("Microphone permission blocked.");
+        } else {
+          setSpeechStatus(`Speech error: ${error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        if (listenTimeoutRef.current) {
+          clearTimeout(listenTimeoutRef.current);
+          listenTimeoutRef.current = null;
+        }
+        if (cancelListenRef.current) {
+          resolved = true;
+          resolve();
+          return;
+        }
+        if (!resolved && allowListeningRef.current) {
+          retryListenRef.current = setTimeout(startListening, 800);
+        }
+      };
+
+      recognitionRef.current = recognition;
+      if (allowListeningRef.current) {
+        startListening();
+      }
+    });
+
+  const runSequence = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    allowListeningRef.current = true;
+    cancelListenRef.current = false;
     setSpeechVerified(false);
-    setSpeechStatus("Listening… say “car”");
-    try {
-      recognition.start();
-    } catch (_) {}
-  };
-
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript.toLowerCase();
-    setSpeechStatus(`Heard: ${transcript}`);
-    if (transcript.includes("car")) {
-      setSpeechVerified(true);
-      speechVerifiedRef.current = true;
-      setSpeechStatus("Great! You said car.");
-      recognition.stop();
-    } else {
-      setSpeechVerified(false);
-      speechVerifiedRef.current = false;
-      setSpeechStatus("Try again: say “car”.");
+    setSpeechStatus("");
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 1;
+    await playAndWait(audio);
+    if (!cancelListenRef.current) {
+      await listenForCar();
     }
   };
 
-  recognition.onerror = () => {
-    setSpeechStatus("Couldn't hear you. Try again.");
-  };
-
-  recognition.onend = () => {
-    if (!speechVerifiedRef.current) {
-      retryListenRef.current = setTimeout(startListening, 800);
-    }
-  };
-
-  recognitionRef.current = recognition;
-
-  const audioEl = audioRef.current;
-  if (audioEl) {
-    audioEl.onended = startListening;
-  } else {
-    startListening();
-  }
+  runSequence();
 
   return () => {
+    cancelListenRef.current = true;
+    allowListeningRef.current = false;
     if (retryListenRef.current) {
       clearTimeout(retryListenRef.current);
       retryListenRef.current = null;
     }
-    if (audioEl) audioEl.onended = null;
+    if (listenTimeoutRef.current) {
+      clearTimeout(listenTimeoutRef.current);
+      listenTimeoutRef.current = null;
+    }
+    if (audioRef.current) audioRef.current.onended = null;
     try {
-      recognition.stop();
+      recognitionRef.current?.stop();
     } catch (_) {}
   };
 }, [i18n.language]);
@@ -128,14 +251,14 @@ useEffect(() => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -60 }}
       transition={{ duration: 0.3 }}
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "100vh", width: "100vw", overflow: "hidden" }}
     >
       <Box sx={{ cursor: `url(${click}) 122 122, auto` }}>
         <Box
           sx={{
             backgroundColor: "#0B3D2E",
-            width: "100%",
-            height: "733px",
+            width: "100vw",
+            height: "100vh",
             opacity: "0.9",
             position: "absolute",
             pointerEvents: "none",
@@ -145,8 +268,9 @@ useEffect(() => {
         <Box
           sx={{
             backgroundImage: `url(${learnbg})`,
-            width: "100%",
-            height: "733px",
+            width: "100vw",
+            minHeight: "100vh",
+            height: "100vh",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             position: "relative",

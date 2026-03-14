@@ -634,6 +634,8 @@ useEffect(() => {
       style={{
         minHeight: "100vh",
         backgroundColor: "transparent",
+        width: "100vw",
+        overflow: "hidden",
       }}
     >
       <Box
@@ -646,8 +648,8 @@ useEffect(() => {
       <Box
         sx={{
           backgroundColor: "#0B3D2E",
-          width: "100%",
-          height: "733px",
+          width: "100vw",
+          height: "100vh",
           opacity: "0.9",
           position: "absolute",
           backgroundAttachment: "fixed",
@@ -657,8 +659,9 @@ useEffect(() => {
       <Box
         sx={{
           backgroundImage: `url(${learnbg})`,
-          width: "100%",
-          height: "733px",
+          width: "100vw",
+          minHeight: "100vh",
+          height: "100vh",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
@@ -790,44 +793,7 @@ opacity:"0.9", }}>{t("sayShoes")}</Typography>
         <Box component='img' sx={{ width: {lg:"65px",sm:"40px"}, height: {lg:"65px",sm:"40px"}, marginLeft: {lg:"1007px",sm:"66%"}, marginTop: {lg:"-16%",sm:"-30%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={pause} />
         <Box component='img' sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"1087px",sm:"73%"}, marginTop: {lg:"-18.9%",sm:"-36%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={retry} />
       </Box>
-    <Box onClick={() => {
-  if (!audioFinished) return;
-  const savedImage = localStorage.getItem("uploadedShoe");
-  if (savedImage) {
-    navigate("/showShoe");
-  } else {
-    navigate("/findshoe"); // agar image nahi hai to find page
-  }
-}}
-component='img' sx={{ width: {lg:"250px",sm:"150px"}, height: {lg:"270px",sm:"150px"}, marginLeft: {lg:"78%",sm:"10%"}, marginTop: {lg:"-17.9%",sm:"-20%"},position:"absolute", "&:hover": { transform: "scale(1.08)", boxShadow: "0 10px 25px rgba(0,0,0,0)" },animation: audioFinished ? 'zoomInOut 1.2s infinite' : 'none',
-    filter: audioFinished
-      ? 'drop-shadow(0 0 18px rgba(255,200,120,0.9))'
-      : 'none',
-    transition: 'all 0.3s ease', }} src={back} />
-                    <Typography onClick={() => {
-  if (!audioFinished) return;
-  const savedImage = localStorage.getItem("uploadedShoe");
-  if (savedImage) {
-    navigate("/showShoe");
-  } else {
-    navigate("/findshoe"); // agar image nahi hai to find page
-  }
-}}
-             sx={{
-               fontSize: {lg:i18n.language === "ur" ? "65px" : "65px",
-                sm:i18n.language === "ur" ? "35px" : "35px",},
-               marginTop: {lg:"-12.2%",sm:"-13%"},
-               marginLeft: {lg:i18n.language === "ur" ? "83.5%" :"82.3%",
-                sm:i18n.language === "ur" ? "18%" : "15%"},
-               fontStyle:"normal",
-               lineHeight:"90%",
-               fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',
-               letterSpacing:"1px",
-color:"rgb(15, 21, 27,0.8)",
-             opacity:"0.9",
-             }}>
-              {t("next")}
-              </Typography>                   </Box>
+                  </Box>
                   <Box
                     sx={{
                       position: "absolute",

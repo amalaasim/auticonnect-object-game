@@ -174,7 +174,7 @@ useEffect(() => {
     yesAudioRef.current.volume = 1;
     yesAudioRef.current.play().catch(() => console.log("Yes autoplay blocked"));
     setTimeout(() => {
-      navigate("/final", { state: { from: "findball" } });
+      navigate("/final", { state: { from: "findcar" } });
     }, 5000);
   } else {
     // Car or Cookie selected → play NO audio
@@ -188,7 +188,7 @@ useEffect(() => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -60 }}
       transition={{ duration: 0.3 }}
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "100vh", width: "100vw", overflow: "hidden" }}
     >
       <Box sx={{ cursor: `url(${click}) 122 122, auto` }}>
 
@@ -196,7 +196,7 @@ useEffect(() => {
         <Box
           sx={{
             backgroundColor: "#0B3D2E",
-            width: "100%",
+            width: "100vw",
             height: "100vh",
             opacity: "0.9",
             position: "absolute",
@@ -208,9 +208,10 @@ useEffect(() => {
         <Box
           sx={{
             backgroundImage: `url(${learnbg})`,
-            width: "100%",
-            height: { lg: "733px", sm: "100vh" },
-            borderRadius: { lg: "35px", sm: "0px" },
+            width: "100vw",
+            minHeight: "100vh",
+            height: "100vh",
+            borderRadius: "0px",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             position: "relative",
@@ -386,7 +387,7 @@ useEffect(() => {
               width: { lg: "132px", sm: "90px" },
               height: { lg: "132px", sm: "90px" },
               marginTop: { lg: "-47%", sm: "-71.5%" },
-              marginLeft: { lg: "-36.5%", sm: "49.5%" },
+              marginLeft: { lg: "-38.5%", sm: "45.5%" },
             }}
           />
 
@@ -398,7 +399,7 @@ useEffect(() => {
               width: { lg: "112px", sm: "80px" },
               height: { lg: "112px", sm: "80px" },
               marginTop: { lg: "-47.5%", sm: "-72%" },
-              marginLeft: { lg: "3.2%", sm: "5%" },
+              marginLeft: { lg: "3.5%", sm: "6%" },
             }}
           />
 
@@ -410,14 +411,14 @@ useEffect(() => {
               width: { lg: "130px", sm: "80px" },
               height: { lg: "130px", sm: "80px" },
               marginTop: { lg: "-47.5%", sm: "-72%" },
-              marginLeft: { lg: "2.9%", sm: "4.3%" },
+              marginLeft: { lg: "3.5%", sm: "4.3%" },
             }}
           />
        <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
-               marginTop: {lg:i18n.language === "ur" ? "-19%" :"-18.6%",sm:i18n.language === "ur" ? "-30%" : "-30%"},
-               marginLeft: {lg:i18n.language === "ur" ? "53.5%" : "53%",sm:i18n.language === "ur" ? "53.5%" : "52.5%"}
+               marginTop: {lg:i18n.language === "ur" ? "-19.3%" :"-19.3%",sm:i18n.language === "ur" ? "-30.5%" : "-30.5%"},
+               marginLeft: {lg:i18n.language === "ur" ? "56.5%" : "56%",sm:i18n.language === "ur" ? "56.5%" : "55.5%"}
 ,               fontStyle:"normal",
                lineHeight:"90%",
                fontFamily:i18n.language === "ur" ? "JameelNooriNastaleeq" : 'Chewy',
@@ -431,7 +432,7 @@ opacity:"0.9",
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
                marginTop: {lg:i18n.language === "ur" ? "-2.29%" :"-2.1%",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "65.5%" : "63.999%",sm:i18n.language === "ur" ? "69.5%" : "67%"},
+               marginLeft:{lg:i18n.language === "ur" ? "68%" : "68%",sm:i18n.language === "ur" ? "69.5" : "69.5%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',
@@ -444,8 +445,8 @@ opacity:"0.9",
                <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "30px" : "23px"},
-              marginTop: {lg:i18n.language === "ur" ? "-2%" :"-1.89%",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "75.9%" : "74.9%",sm:i18n.language === "ur" ? "83.9%" : "82.2%"},
+              marginTop: {lg:i18n.language === "ur" ? "-2.2%" :"-2.2%",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
+               marginLeft:{lg:i18n.language === "ur" ? "79%" : "79%",sm:i18n.language === "ur" ? "83.9%" : "82.2%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "Jameelnoorinastaleeq" :'Chewy',
@@ -474,7 +475,9 @@ opacity:"0.9",
               sx={{
                 width: { lg: "120px", sm: "80px" },
                 height: { lg: "112px", sm: "70px" },
-                marginLeft: { lg: "62.8%", sm: "66%" },
+                marginLeft: selectedImageSrc === car
+                  ? { lg: "65.5%", sm: "69%" }
+                  : { lg: "62.8%", sm: "66%" },
                 marginTop: {lg:"-23.2%",sm:"-27.5%"}
               }}
             />
