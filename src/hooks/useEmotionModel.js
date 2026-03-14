@@ -17,12 +17,17 @@ export function useEmotionModel({ enabled, videoRef, currentSceneId }) {
     if (!videoRef.current) return false;
     if (!modelsLoadedRef.current) return false;
 
-    const detections = await faceapi
-      .detectSingleFace(
-        videoRef.current,
-        new faceapi.TinyFaceDetectorOptions()
-      )
-      .withFaceExpressions();
+    let detections = null;
+    try {
+      detections = await faceapi
+        .detectSingleFace(
+          videoRef.current,
+          new faceapi.TinyFaceDetectorOptions()
+        )
+        .withFaceExpressions();
+    } catch (_) {
+      return false;
+    }
 
     if (!detections || !detections.expressions) return false;
 
@@ -44,19 +49,24 @@ export function useEmotionModel({ enabled, videoRef, currentSceneId }) {
   // Load face-api models once
   useEffect(() => {
     async function loadModels() {
+      if (!enabled || modelsLoadedRef.current) return;
       const MODEL_URL = "/models/face-api";
 
-      await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-        faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
-      ]);
+      try {
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+        ]);
+      } catch (_) {
+        return;
+      }
 
       modelsLoadedRef.current = true;
       console.log("[EmotionModel] face-api models loaded");
     }
 
     loadModels();
-  }, []);
+  }, [enabled]);
 
   // Emotion sampling loop
   useEffect(() => {

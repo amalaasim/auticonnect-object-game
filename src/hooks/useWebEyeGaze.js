@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaceMesh } from "@mediapipe/face_mesh";
 import { Camera } from "@mediapipe/camera_utils";
 
-export function useWebEyeGaze() {
+export function useWebEyeGaze({ enabled = true } = {}) {
   // We will expose this ref and attach it to a real <video> element
   const videoRef = useRef(null);
   const [isLooking, setIsLooking] = useState(false);
@@ -11,8 +11,13 @@ export function useWebEyeGaze() {
   const cameraRef = useRef(null);
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLooking(false);
+      return;
+    }
     // 1. Safety check: If the user didn't attach the ref to a video, abort.
     if (!videoRef.current) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
 
     const faceMesh = new FaceMesh({
       locateFile: (file) =>
@@ -51,7 +56,7 @@ export function useWebEyeGaze() {
         height: 480,
       });
 
-      cameraRef.current.start();
+      Promise.resolve(cameraRef.current.start()).catch(() => {});
     }
 
     return () => {
@@ -59,10 +64,14 @@ export function useWebEyeGaze() {
       if (cameraRef.current) cameraRef.current.stop();
       if (faceMesh) faceMesh.close();
     };
-  }, []); // Run once on mount
+  }, [enabled]);
 
   // 3. Watchdog Timer (Heartbeat)
   useEffect(() => {
+    if (!enabled) {
+      setIsLooking(false);
+      return;
+    }
     watchdogRef.current = setInterval(() => {
       const now = Date.now();
       const timeoutThreshold = 1000;
@@ -77,7 +86,7 @@ export function useWebEyeGaze() {
     }, 500);
 
     return () => clearInterval(watchdogRef.current);
-  }, []);
+  }, [enabled]);
 
   return { isLooking, videoRef };
 }

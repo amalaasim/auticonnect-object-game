@@ -442,6 +442,7 @@ const audio2Ref = useRef(null);
 const audio3Ref = useRef(null);
 const recognitionRef = useRef(null);
 const retryListenRef = useRef(null);
+const autoAdvanceRef = useRef(false);
 const playAndWait = (audio) => {
   return new Promise((resolve) => {
     audio.onended = () => resolve();
@@ -561,6 +562,7 @@ useEffect(() => {
       setSpeechVerified(false);
       setSpeechStatus("");
       setSpeechStep(1);
+      autoAdvanceRef.current = false;
       audio1Ref.current.pause();
       audio2Ref.current.pause();
       audio3Ref.current.pause();
@@ -596,6 +598,16 @@ useEffect(() => {
   useEffect(() => {
     speechVerifiedRef.current = speechVerified;
   }, [speechVerified]);
+  useEffect(() => {
+    if (!audioFinished || autoAdvanceRef.current) return;
+    autoAdvanceRef.current = true;
+    const savedImage = localStorage.getItem("uploadedShoe");
+    if (savedImage) {
+      navigate("/showShoe");
+    } else {
+      navigate("/findshoe"); // agar image nahi hai to find page
+    }
+  }, [audioFinished, navigate]);
   
     React.useEffect(() => {
    if (showPopup || showUpload) {

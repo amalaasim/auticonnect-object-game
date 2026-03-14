@@ -439,12 +439,23 @@ function Learnobjcar() {
   const audio3Ref = useRef(null);
   const recognitionRef = useRef(null);
   const retryListenRef = useRef(null);
-  const playAndWait = (audio) => {
-    return new Promise((resolve) => {
-      audio.onended = () => resolve();
-      audio.play().catch(() => console.log("Autoplay blocked"));
-    });
-  };
+  const autoAdvanceRef = useRef(false);
+  const startListeningRef = useRef(null);
+  const currentAudioRef = useRef(null);
+  const allowListeningRef = useRef(true);
+  const isPausedRef = useRef(false);
+  const sequenceCancelRef = useRef(false);
+  const cancelListenRef = useRef(false);
+const playAndWait = (audio) => {
+  return new Promise((resolve) => {
+    if (!audio || sequenceCancelRef.current) {
+      resolve();
+      return;
+    }
+    audio.onended = () => resolve();
+    audio.play().catch(() => console.log("Autoplay blocked"));
+  });
+};
   
   const wait = (ms) => new Promise(res => setTimeout(res, ms));
   const [audioFinished, setAudioFinished] = useState(false);
@@ -466,6 +477,10 @@ function Learnobjcar() {
 
   const listenForCar = () => {
     return new Promise((resolve, reject) => {
+      let resolved = false;
+      cancelListenRef.current = false;
+      const targetWord = i18n.language === "ur" ? "gari" : "car";
+      const recognitionLang = i18n.language === "ur" ? "ur-PK" : "en-US";
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -476,9 +491,9 @@ function Learnobjcar() {
       }
 
       const recognition = new SpeechRecognition();
-      recognition.lang = i18n.language === "ur" ? "ur-PK" : "en-US";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+      recognition.lang = recognitionLang;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 5;
       recognition.continuous = false;
 
       const startListening = () => {
@@ -487,38 +502,61 @@ function Learnobjcar() {
           retryListenRef.current = null;
         }
         setSpeechVerified(false);
-        setSpeechStatus("Listening… say “car”");
+        setSpeechStatus(`Listening… say “${targetWord}”`);
         try {
           recognition.start();
         } catch (_) {
-          // ignore
+          // Ignore "start called twice" errors
         }
       };
+      startListeningRef.current = startListening;
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        const normalized = transcript.replace(/\s/g, "");
-        const matches =
-          normalized.includes("gari") ||
-          normalized.includes("gaari") ||
-          normalized.includes("gaڑی") ||
-          normalized.includes("گاڑی");
-        incrementVoiceTries();
+        const result = event.results[event.resultIndex] || event.results[0];
+        const transcripts = Array.from(result || []).map((item) =>
+          item.transcript.toLowerCase()
+        );
+        const transcript = transcripts[0] || "";
+        const variants = [
+          "car",
+          "cars",
+          "carr",
+          "care",
+          "cur",
+          "kar",
+          "kaar",
+          "gari",
+          "gaari",
+          "گاڑی",
+          "گاڑي",
+        ];
+        const matches = transcripts.some((value) => {
+          const normalized = value.replace(/[\s\-_.']/g, "");
+          return variants.some(
+            (variant) =>
+              normalized.includes(variant) || normalized.startsWith(variant)
+          );
+        });
+
+        if (result?.isFinal) {
+          incrementVoiceTries();
+        }
         setSpeechStatus(`Heard: ${transcript}`);
         if (matches) {
           setSpeechVerified(true);
           speechVerifiedRef.current = true;
-          setSpeechStatus("Great! You said car.");
+          setSpeechStatus(`Great! You said ${targetWord}.`);
           if (retryListenRef.current) {
             clearTimeout(retryListenRef.current);
             retryListenRef.current = null;
           }
+          resolved = true;
           recognition.stop();
           resolve();
         } else {
           setSpeechVerified(false);
           speechVerifiedRef.current = false;
-          setSpeechStatus("Try again: say “car”.");
+          setSpeechStatus(`Try again: say “${targetWord}”.`);
         }
       };
 
@@ -527,13 +565,20 @@ function Learnobjcar() {
       };
 
       recognition.onend = () => {
-        if (!speechVerifiedRef.current) {
+        if (cancelListenRef.current) {
+          resolved = true;
+          resolve();
+          return;
+        }
+        if (!resolved && allowListeningRef.current) {
           retryListenRef.current = setTimeout(startListening, 800);
         }
       };
 
       recognitionRef.current = recognition;
-      startListening();
+      if (allowListeningRef.current) {
+        startListening();
+      }
     });
   };
 
@@ -550,47 +595,137 @@ function Learnobjcar() {
       }
     };
   }, []);
-  useEffect(() => {
-    const playSequence = async () => {
-      try {
-         setAudioFinished(false);
-         setSpeechVerified(false);
-         setSpeechStatus("");
-         setSpeechStep(1);
-         audio1Ref.current.pause();
-              audio2Ref.current.pause();
-              audio3Ref.current.pause();
-               audio1Ref.current.currentTime = 0;
+  const playSequence = async () => {
+    try {
+      sequenceCancelRef.current = false;
+      isPausedRef.current = false;
+      allowListeningRef.current = true;
+      setAudioFinished(false);
+      setSpeechVerified(false);
+      setSpeechStatus("");
+      setSpeechStep(1);
+      autoAdvanceRef.current = false;
+      audio1Ref.current.pause();
+      audio2Ref.current.pause();
+      audio3Ref.current.pause();
+      audio1Ref.current.currentTime = 0;
       audio2Ref.current.currentTime = 0;
       audio3Ref.current.currentTime = 0;
 
-        audio1Ref.current.volume = 1;
-        await playAndWait(audio1Ref.current);
-  
-        await wait(500);
-        setSpeechStep(1);
-        await listenForCar();
-  
-        audio2Ref.current.volume = 1;
-        await playAndWait(audio2Ref.current);
-  
-        await wait(500);
-        setSpeechStep(2);
-        await listenForCar();
-  
-        audio3Ref.current.volume = 1;
-        await playAndWait(audio3Ref.current);
-              setAudioFinished(true);
-      } catch (e) {
-        console.log("Audio error", e);
-      }
-    };
-  
+      currentAudioRef.current = audio1Ref.current;
+      audio1Ref.current.volume = 1;
+      await playAndWait(audio1Ref.current);
+      if (sequenceCancelRef.current) return;
+
+      await wait(500);
+      setSpeechStep(1);
+      await listenForCar();
+      if (sequenceCancelRef.current) return;
+
+      currentAudioRef.current = audio2Ref.current;
+      audio2Ref.current.volume = 1;
+      await playAndWait(audio2Ref.current);
+      if (sequenceCancelRef.current) return;
+
+      await wait(500);
+      setSpeechStep(2);
+      await listenForCar();
+      if (sequenceCancelRef.current) return;
+
+      currentAudioRef.current = audio3Ref.current;
+      audio3Ref.current.volume = 1;
+      await playAndWait(audio3Ref.current);
+      if (sequenceCancelRef.current) return;
+
+      currentAudioRef.current = null;
+      setAudioFinished(true);
+    } catch (e) {
+      console.log("Audio error", e);
+    }
+  };
+
+  useEffect(() => {
     playSequence();
   }, [i18n.language]);
   useEffect(() => {
     speechVerifiedRef.current = speechVerified;
   }, [speechVerified]);
+  useEffect(() => {
+    if (!audioFinished || autoAdvanceRef.current) return;
+    autoAdvanceRef.current = true;
+    const savedImage = localStorage.getItem("uploadedCar");
+    if (savedImage) {
+      navigate("/car");
+    } else {
+      navigate("/findcar"); // agar image nahi hai to find page
+    }
+  }, [audioFinished, navigate]);
+
+const handlePauseResume = () => {
+  if (!isPausedRef.current) {
+    isPausedRef.current = true;
+    allowListeningRef.current = false;
+    if (retryListenRef.current) {
+      clearTimeout(retryListenRef.current);
+      retryListenRef.current = null;
+    }
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (_) {}
+    }
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+    }
+    setSpeechStatus("Paused");
+  } else {
+    isPausedRef.current = false;
+    allowListeningRef.current = true;
+    if (currentAudioRef.current && currentAudioRef.current.paused) {
+      currentAudioRef.current.play().catch(() => {});
+    } else if (startListeningRef.current) {
+      try {
+        startListeningRef.current();
+      } catch (_) {}
+    }
+    setSpeechStatus("");
+  }
+};
+
+const handleStop = () => {
+  sequenceCancelRef.current = true;
+  isPausedRef.current = false;
+  allowListeningRef.current = false;
+  cancelListenRef.current = true;
+  if (retryListenRef.current) {
+    clearTimeout(retryListenRef.current);
+    retryListenRef.current = null;
+  }
+  if (recognitionRef.current) {
+    try {
+      recognitionRef.current.stop();
+    } catch (_) {}
+  }
+  [audio1Ref.current, audio2Ref.current, audio3Ref.current].forEach((a) => {
+    if (!a) return;
+    try {
+      a.pause();
+      a.currentTime = 0;
+      if (typeof a.onended === "function") a.onended();
+    } catch (_) {}
+  });
+  currentAudioRef.current = null;
+  setSpeechVerified(false);
+  setSpeechStatus("Stopped");
+  setAudioFinished(false);
+};
+
+const handleRestart = () => {
+  handleStop();
+  setTimeout(() => {
+    playSequence();
+  }, 150);
+};
    const [showPopup, setShowPopup] = React.useState(false); // popup state
       const [showUpload, setShowUpload] = React.useState(false);
        React.useEffect(() => {
@@ -630,8 +765,8 @@ function Learnobjcar() {
       <Box
         sx={{
           backgroundColor: "#0B3D2E",
-          width: "100%",
-          height: "733px",
+          width: "100vw",
+          height: "100vh",
           opacity: "0.9",
           position: "absolute",
           backgroundAttachment: "fixed",
@@ -641,8 +776,8 @@ function Learnobjcar() {
       <Box
         sx={{
           backgroundImage: `url(${learnbg})`,
-          width: "100%",
-          height: "733px",
+          width: "100vw",
+          minHeight: "100vh",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
@@ -767,12 +902,12 @@ opacity:"0.9",
                color:"rgba(130, 77, 31, 1)",
 opacity:"0.9", }}>{t("saycar")}</Typography> 
         <Box component='img' sx={{ width: {lg:"518px",sm:"40%"}, height: {lg:"300px",sm:"22%"}, marginLeft: {lg:"780px",sm:"49%"}, marginTop: "1.8%" }} src={brown} />
-        <Box component='img' sx={{ width:{lg:"200px",sm:"130px"}, height: {lg:"200px",sm:"130px"}, marginLeft: {lg:"786px",sm:"49%"}, marginTop: {lg:"-18%",sm:"-20%"} }} src={half} />
-        <Box component='img' sx={{ width:{lg:"200px",sm:"100px"}, height: {lg:"180px",sm:"100px"}, marginLeft: {lg:"64%",sm:"64%"}, marginTop: {lg:"-32%",sm:"-38%"} }} src={full} />
-        <Box component='img' sx={{ width:{lg:"200px",sm:"130px"}, height: {lg:"220px",sm:"130px"}, marginLeft: {lg:"72%",sm:"72%"}, marginTop: {lg:"-20%",sm:"-30%"} }} src={three} />
-        <Box component='img' sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"940px",sm:"60%"}, marginTop: {lg:"-12.5%",sm:"-24%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={stop} />
-        <Box component='img' sx={{ width: {lg:"65px",sm:"40px"}, height: {lg:"65px",sm:"40px"}, marginLeft: {lg:"1007px",sm:"66%"}, marginTop: {lg:"-16%",sm:"-30%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={pause} />
-        <Box component='img' sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"1087px",sm:"73%"}, marginTop: {lg:"-18.9%",sm:"-36%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={retry} />
+        <Box component='img' sx={{ width:{lg:"200px",sm:"130px"}, height: {lg:"200px",sm:"130px"}, marginLeft: {lg:"810px",sm:"52%"}, marginTop: {lg:"-18%",sm:"-20%"} }} src={half} />
+        <Box component='img' sx={{ width:{lg:"200px",sm:"100px"}, height: {lg:"180px",sm:"100px"}, marginLeft: {lg:"66%",sm:"66%"}, marginTop: {lg:"-32%",sm:"-38%"} }} src={full} />
+        <Box component='img' sx={{ width:{lg:"200px",sm:"130px"}, height: {lg:"220px",sm:"130px"}, marginLeft: {lg:"74%",sm:"74%"}, marginTop: {lg:"-20%",sm:"-30%"} }} src={three} />
+        <Box component='img' onClick={handleStop} sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"940px",sm:"60%"}, marginTop: {lg:"-12.5%",sm:"-24%"}, cursor: "pointer", position: "relative", zIndex: 10, pointerEvents: "auto", "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={stop} />
+        <Box component='img' onClick={handlePauseResume} sx={{ width: {lg:"65px",sm:"40px"}, height: {lg:"65px",sm:"40px"}, marginLeft: {lg:"1007px",sm:"66%"}, marginTop: {lg:"-16%",sm:"-30%"}, cursor: "pointer", position: "relative", zIndex: 10, pointerEvents: "auto", "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={pause} />
+        <Box component='img' onClick={handleRestart} sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"1087px",sm:"73%"}, marginTop: {lg:"-18.9%",sm:"-36%"}, cursor: "pointer", position: "relative", zIndex: 10, pointerEvents: "auto", "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={retry} />
       </Box>
     <Box onClick={() => {
   if (!audioFinished) return;
@@ -783,7 +918,7 @@ opacity:"0.9", }}>{t("saycar")}</Typography>
     navigate("/findcar"); // agar image nahi hai to find page
   }
 }}
- component='img' sx={{ width: {lg:"250px",sm:"150px"}, height: {lg:"270px",sm:"150px"}, marginLeft: {lg:"78%",sm:"10%"}, marginTop: {lg:"-17.9%",sm:"-20%"},position:"absolute", "&:hover": { transform: "scale(1.08)", boxShadow: "0 10px 25px rgba(0,0,0,0)" },animation: audioFinished ? 'zoomInOut 1.2s infinite' : 'none',
+ component='img' sx={{ width: {lg:"250px",sm:"150px"}, height: {lg:"270px",sm:"150px"}, marginLeft: {lg:"78%",sm:"10%"}, marginTop: {lg:"-18.7%",sm:"-20.7%"},position:"absolute", "&:hover": { transform: "scale(1.08)", boxShadow: "0 10px 25px rgba(0,0,0,0)" },animation: audioFinished ? 'zoomInOut 1.2s infinite' : 'none',
     filter: audioFinished
       ? 'drop-shadow(0 0 18px rgba(255,200,120,0.9))'
       : 'none',
@@ -801,9 +936,9 @@ opacity:"0.9", }}>{t("saycar")}</Typography>
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "65px" : "65px",
                 sm:i18n.language === "ur" ? "40px" : "35px",},
-               marginTop: {lg:"-12.2%",sm:"-13%"},
+               marginTop: {lg:"-12.5%",sm:"-13.5%"},
                marginLeft: {lg:i18n.language === "ur" ? "83.5%" :"82.3%",
-                sm:i18n.language === "ur" ? "16%" : "15%"},
+                sm:i18n.language === "ur" ? "17%" : "15%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',

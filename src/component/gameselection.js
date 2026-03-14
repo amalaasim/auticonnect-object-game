@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 // Assets
-import bg from "../assests/background.png";
 import logo from "../assests/logo.png";
 import setting from "../assests/setting.png";
 import contact from "../assests/contact.png";
@@ -43,14 +42,22 @@ function GameSelection() {
         component="img"
         src={image}
         sx={{
-          width: { xs: "200px", md: "250px", lg: "300px" },
+          width: "clamp(12rem, 20vw, 19rem)",
           height: "auto",
           borderRadius: "50%",
         }}
       />
 
       {/* Label Container (Background + Text) */}
-      <Box sx={{ position: "relative", marginTop: "-40px", width: "100%", display: 'flex', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          position: "relative",
+          marginTop: "-10%",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
         {/* Label Background Pill */}
         <Box
           component="img"
@@ -70,12 +77,12 @@ function GameSelection() {
             transform: "translate(-50%, -50%)", // Perfect centering
             width: "100%",
             textAlign: "center",
-            fontSize: { xs: "18px", md: "22px", lg: "26px" },
+            fontSize: "clamp(1.05rem, 2.1vw, 1.6rem)",
             fontFamily: "Chewy",
-            letterSpacing: "1px",
+            letterSpacing: "0.06em",
             color: "rgb(15, 21, 27, 0.8)",
             lineHeight: "1",
-            paddingTop: "6px", // Visual adjustment for Chewy font
+            paddingTop: "0.35rem", // Visual adjustment for Chewy font
           }}
         >
           {t(title)}
@@ -97,10 +104,7 @@ function GameSelection() {
         // ---------------------------------------------------------
         overflow: "hidden",
         cursor: `url(${click}) 32 32, auto`,
-        backgroundImage: `url(${bg})`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundColor: "#0b1c16",
       }}
     >
       {/* --- Header Section --- */}
@@ -110,10 +114,10 @@ function GameSelection() {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: { xs: "1rem", md: "1rem 5%" },
+          padding: { xs: "1rem", md: "1rem 5vw" },
           background:
             "linear-gradient(10deg, rgba(5, 8, 7, 0.6) 0%, rgba(11,61,46,0.4) 100%)",
-          borderRadius: "0 0 10px 10px",
+          borderRadius: "0 0 0.6rem 0.6rem",
           border: "none",
           boxShadow: "none",
         }}
@@ -122,7 +126,7 @@ function GameSelection() {
           component="img"
           src={logo}
           sx={{
-            width: { xs: "120px", sm: "180px", md: "220px" },
+            width: "clamp(7.5rem, 18vw, 14rem)",
             height: "auto",
           }}
         />
@@ -133,7 +137,7 @@ function GameSelection() {
               component="img"
               src={img}
               sx={{
-                width: { xs: "30px", md: "45px" },
+                width: "clamp(1.7rem, 3.2vw, 2.8rem)",
                 height: "auto",
                 cursor: "pointer",
               }}
@@ -149,9 +153,9 @@ function GameSelection() {
           flexDirection: { xs: "column", md: "row" }, // Stack on phone, row on PC
           justifyContent: "center",
           alignItems: "center",
-          height: "calc(100vh - 150px)", // Full height minus header
+          height: "calc(100vh - 18vh)", // Full height minus header
           gap: { xs: 4, md: 8, lg: 15 }, // Space between the two buttons
-          marginTop: "-20px" // Slight visual lift
+          marginTop: "-2vh" // Slight visual lift
         }}
       >
         <GameOption
@@ -176,9 +180,9 @@ function GameSelection() {
         src={back}
         sx={{
           position: "absolute",
-          left: { xs: "10px", md: "50px" },
-          bottom: { xs: "10px", md: "20px" },
-          width: { xs: "150px", md: "250px" },
+          left: "clamp(0.6rem, 2vw, 3rem)",
+          bottom: "clamp(0.6rem, 2vw, 1.5rem)",
+          width: "clamp(9rem, 18vw, 16rem)",
           height: "auto",
           cursor: "pointer",
           transition: "transform 0.3s ease",

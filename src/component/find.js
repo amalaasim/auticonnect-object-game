@@ -39,7 +39,8 @@ function Find() {
   const lookHereAudioRef = useRef(null);
   const notLookingTimeoutRef = useRef(null);
   const notLookingIntervalRef = useRef(null);
-  const { isLooking, videoRef } = useWebEyeGaze();
+  const navigateTimeoutRef = useRef(null);
+  const { isLooking, videoRef } = useWebEyeGaze({ enabled: cameraAllowed });
   const { emotionCounts, sampleEmotion } = useEmotionModel({
     enabled: cameraAllowed,
     videoRef,
@@ -172,11 +173,38 @@ function Find() {
       localStorage.setItem("cookie_select_done", "true");
       setSelectionRecorded(true);
     }
-    yesAudioRef.current.volume = 1;
-    yesAudioRef.current.play().catch(() => {});
-    setTimeout(() => {
+    const audio = yesAudioRef.current;
+    let didNavigate = false;
+    const goNext = () => {
+      if (didNavigate) return;
+      didNavigate = true;
       navigate("/final", { state: { from: "findball" } });
-    }, 2000);
+    };
+
+    if (navigateTimeoutRef.current) {
+      clearTimeout(navigateTimeoutRef.current);
+      navigateTimeoutRef.current = null;
+    }
+
+    if (audio) {
+      audio.volume = 1;
+      audio.onended = () => {
+        if (navigateTimeoutRef.current) {
+          clearTimeout(navigateTimeoutRef.current);
+          navigateTimeoutRef.current = null;
+        }
+        navigateTimeoutRef.current = setTimeout(goNext, 2000);
+      };
+      audio.play().catch(() => {});
+
+      const durationMs =
+        Number.isFinite(audio.duration) && audio.duration > 0
+          ? Math.ceil(audio.duration * 1000)
+          : 2000;
+      navigateTimeoutRef.current = setTimeout(goNext, durationMs + 2150);
+    } else {
+      navigateTimeoutRef.current = setTimeout(goNext, 2000);
+    }
   } else {
     noAudioRef.current.volume = 1;
     noAudioRef.current.play().catch(() => {});
@@ -209,9 +237,9 @@ function Find() {
         <Box
           sx={{
             backgroundImage: `url(${learnbg})`,
-            width: "100%",
-            height: { lg: "733px", sm: "100vh" },
-            borderRadius: { lg: "35px", sm: "0px" },
+            width: "100vw",
+            minHeight: "100vh",
+            borderRadius: "0px",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             position: "relative",
@@ -389,7 +417,7 @@ function Find() {
               width: { lg: "132px", sm: "90px" },
               height: { lg: "132px", sm: "90px" },
               marginTop: { lg: "-47%", sm: "-71.5%" },
-              marginLeft: { lg: "-36.5%", sm: "49.5%" },
+              marginLeft: { lg: "calc(-36.5% - 25px)", sm: "calc(49.5% - 20px)" },
             }}
           />
 
@@ -417,15 +445,15 @@ function Find() {
               width: { lg: "130px", sm: "80px" },
               height: { lg: "130px", sm: "80px" },
               marginTop: { lg: "-47.5%", sm: "-72%" },
-              marginLeft: { lg: "2.4%", sm: "4.3%" },
+              marginLeft: { lg: "calc(2.4% - 0px)", sm: "calc(4.3% - 0px)" },
 
             }}
           />
        <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
-               marginTop: {lg:i18n.language === "ur" ? "-19%" :"-18.6%",sm:i18n.language === "ur" ? "-30%" : "-30%"},
-               marginLeft: {lg:i18n.language === "ur" ? "53.5%" : "53%",sm:i18n.language === "ur" ? "53.5%" : "52.5%"}
+               marginTop: {lg:i18n.language === "ur" ? "calc(-19% - 10px)" : "calc(-18.6% - 10px)",sm:i18n.language === "ur" ? "calc(-30% - 10px)" : "calc(-30% - 10px)"},
+               marginLeft: {lg:i18n.language === "ur" ? "calc(53.5% + 40px)" : "calc(53% + 40px)",sm:i18n.language === "ur" ? "calc(53.5% + 40px)" : "calc(52.5% + 40px)"}
 ,               fontStyle:"normal",
                lineHeight:"90%",
                fontFamily:i18n.language === "ur" ? "JameelNooriNastaleeq" : 'Chewy',
@@ -438,8 +466,8 @@ opacity:"0.9",
         <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
-               marginTop: {lg:i18n.language === "ur" ? "-2.69%" :"-2.1%",sm:i18n.language === "ur" ? "-3.3%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "65.5%" : "63.999%",sm:i18n.language === "ur" ? "69.5%" : "67%"},
+               marginTop: {lg:i18n.language === "ur" ? "calc(-2.69% - 2px)" : "calc(-2.1% - 2px)",sm:i18n.language === "ur" ? "calc(-3.3% - 10px)" : "calc(-2.7% - 10px)"},
+               marginLeft:{lg:i18n.language === "ur" ? "calc(65.5% + 45px)" : "calc(63.999% + 45px)",sm:i18n.language === "ur" ? "calc(69.5% + 40px)" : "calc(67% + 40px)"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',
@@ -452,8 +480,8 @@ opacity:"0.9",
                <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "30px" : "23px"},
-              marginTop: {lg:i18n.language === "ur" ? "-1.7%" :"-1.89%",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "75.9%" : "74.9%",sm:i18n.language === "ur" ? "83.9%" : "82.2%"},
+              marginTop: {lg:i18n.language === "ur" ? "calc(-1.7% - 3px)" : "calc(-1.89% - 3px)",sm:i18n.language === "ur" ? "calc(-2.9% - 10px)" : "calc(-2.7% - 10px)"},
+               marginLeft:{lg:i18n.language === "ur" ? "calc(75.9% + 46px)" : "calc(74.9% + 46px)",sm:i18n.language === "ur" ? "calc(83.9% + 40px)" : "calc(82.2% + 40px)"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "Jameelnoorinastaleeq" :'Chewy',
@@ -496,10 +524,10 @@ opacity:"0.9",
             component="img"
             src={arrow}
             sx={{
-              width: { lg: "317px", sm: "200px" },
-              height: { lg: "377px", sm: "240px" },
-              marginLeft: { lg: "65%", sm: "70%" },
-              marginTop: {lg:"-8%",sm:"-11%"}
+              width: { lg: "200px", sm: "130px" },
+              height: { lg: "235px", sm: "160px" },
+              marginLeft: { lg: "73%", sm: "70%" },
+              marginTop: {lg:"-2%",sm:"-5%"}
             }}
           />
 
@@ -511,7 +539,15 @@ opacity:"0.9",
                 width: { lg: "120px", sm: "80px" },
                 height: { lg: "112px", sm: "70px" },
                 marginLeft: { lg: "62.8%", sm: "66%" },
-                marginTop: {lg:"-22.2%",sm:"-27.5%"}
+                marginTop: {lg:"-22.2%",sm:"-27.5%"},
+                transform:
+                  selectedImageSrc === book
+                    ? "translate(43px, 45px)"
+                    : selectedImageSrc === fball
+                    ? "translate(45px, 40px)"
+                    : selectedImageSrc === full
+                    ? "translate(45px, 40px)"
+                    : "none",
               }}
             />
           )}

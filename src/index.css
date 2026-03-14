@@ -10,8 +10,6 @@ body {
   cursor: url('./assests/click.png') 122 122, auto;
   background: #080f01;
   overflow: hidden;
-  background: url('./assests/background.png') no-repeat center center fixed;
-  background-size: cover;
 }
 
 @font-face {

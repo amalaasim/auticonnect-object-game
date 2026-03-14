@@ -36,7 +36,7 @@ function Findshoe() {
  const audioRef = useRef(null);
 const yesAudioRef = useRef(null);
 const noAudioRef = useRef(null);
-  const { isLooking, videoRef } = useWebEyeGaze();
+  const { isLooking, videoRef } = useWebEyeGaze({ enabled: cameraAllowed });
   const lookHereAudioRef = useRef(null);
   const notLookingTimeoutRef = useRef(null);
   const notLookingIntervalRef = useRef(null);

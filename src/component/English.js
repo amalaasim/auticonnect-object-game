@@ -40,8 +40,8 @@ export default function English() {
         <Box
           sx={{
             backgroundImage: `url(${bg})`,
-            width: "100%",
-            height: {lg:"743px",sm:"816px"},
+            width: "100vw",
+            minHeight: "100vh",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             backgroundAttachment: "fixed",
@@ -108,7 +108,7 @@ gap:{sm:"1rem"} }}>
               <Typography sx={{backgroundColor:"rgba(111, 117, 131, 0.6)",fontFamily:i18n.language === "ur" ? "JameelNooriNastaleeq" :  "Petrona",fontWeight:"600",color:"rgba(255, 255, 255, 1)",fontSize:i18n.language === "ur" ? "28px" : "22px",lineHeight:i18n.language === "ur" ? "36px":"24px",paddingRight:"5%",letterSpacing:"0.38px",
                   mt: { lg: i18n.language === "ur" ? "-23.5%" : "-19.3%", sm: i18n.language === "ur" ?"-23%": "-19.3%", xs: "-12%" },
                width:{ lg: "100%", md: "100%", sm: "95%", xs: "100%"},
-paddingTop:"2.3%",paddingLeft:"5%",paddingBottom:"2.3%",height:"100%",borderRadius:"20px"}}>
+paddingTop:"2.3%",paddingLeft:"5%",paddingBottom:"2.6%",height:"auto",borderRadius:"20px"}}>
                 <span style={{fontFamily:i18n.language === "ur" ? "JameelNooriNastaleeq" :  "chewy",fontWeight:"400",fontStyle:"Regular",fontSize:i18n.language === "ur" ? "42px" : "26.45px",lineHeight:"47px",letterSpacing:"2px"}}>
                   {t("wonderWorldTitle")}
                 </span>
@@ -132,9 +132,9 @@ paddingTop:"2.3%",paddingLeft:"5%",paddingBottom:"2.3%",height:"100%",borderRadi
 
               <Typography sx={{backgroundColor:"rgba(111, 117, 131, 0.6)",
     width:{ lg: "100%", md: "100%", sm: "95%", xs: "100%"},
-paddingRight:"5%",paddingBottom:"2.3%",fontFamily:i18n.language === "ur" ? "JameelNooriNastaleeq" : "Petrona",fontWeight:"600",color:"rgba(255, 255, 255, 1)",fontSize:i18n.language === "ur" ? "27px" : "22px",lineHeight:i18n.language === "ur" ? "36px" : "24px",letterSpacing:"0.38px",
+paddingRight:"5%",paddingBottom:"2.6%",fontFamily:i18n.language === "ur" ? "JameelNooriNastaleeq" : "Petrona",fontWeight:"600",color:"rgba(255, 255, 255, 1)",fontSize:i18n.language === "ur" ? "27px" : "22px",lineHeight:i18n.language === "ur" ? "36px" : "24px",letterSpacing:"0.38px",
 mt: { lg: i18n.language === "ur" ? "-23.5%" : "-19.5%", sm:  i18n.language === "ur" ?"-22.6%":"-19.2%", xs: "-12%" },
-paddingTop:"2.3%",paddingLeft:"5%",height:"100%",borderRadius:"20px"}}>
+paddingTop:"2.3%",paddingLeft:"5%",height:"auto",borderRadius:"20px"}}>
                   <span style={{fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" : "chewy",fontWeight:"400",fontStyle:"Regular",fontSize:i18n.language === "ur" ? "42px" : "26.45px",lineHeight:"47px",letterSpacing:"2px"}}>
                   {t("socialStoryTitle")}
                 </span>
@@ -177,8 +177,8 @@ paddingTop:"2.3%",paddingLeft:"5%",height:"100%",borderRadius:"20px"}}>
         </Box>
 
        <Box  component="img" src={play} sx={{width:{lg:"190px",sm:"120px"},height:"90px",marginLeft:{lg:"60%",sm:"55%"},paddingLeft:"6%",marginRight:{lg:i18n.language === "ur" ? "65%" : "0%",sm:i18n.language === "ur" ? "55%" : "0%"},
-       marginTop:{lg: i18n.language === "ur" ?"-11%":"-8%",sm: i18n.language === "ur" ?"-15%":"-24%"}}}/>
-       <Box  component="img" src={cartoon} sx={{width:{lg:"27.1%",sm:"29%"},height:"43%", marginLeft:"66%",marginRight:{lg:i18n.language === "ur" ? "70%" : "0%",sm:i18n.language === "ur" ? "65%" : "0%"},paddingLeft:"6%",marginTop:{lg: i18n.language === "ur" ?"-15.5%":"-13.7%",sm: i18n.language === "ur" ?"-21%":"-32%"},}}/>
+       marginTop:{lg: i18n.language === "ur" ?"-11%":"-8%",sm: i18n.language === "ur" ?"-18%":"-35%"}}}/>
+       <Box  component="img" src={cartoon} sx={{width:{lg:"32%",sm:"235%"},height:"43%", marginLeft:"66%",marginRight:{lg:i18n.language === "ur" ? "70%" : "0%",sm:i18n.language === "ur" ? "65%" : "0%"},paddingLeft:"6%",marginTop:{lg: i18n.language === "ur" ?"-18%":"-16%",sm: i18n.language === "ur" ?"-24%":"-35%"},}}/>
        </Box>
        </Box>
       </Box>

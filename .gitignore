@@ -13,7 +13,12 @@
 
 # misc
 .DS_Store
+.eslintcache
+.cache
+.vscode/
+.idea/
 .env.local
+.env
 .env.development.local
 .env.test.local
 .env.production.local

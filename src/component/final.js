@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material';
 import './final.css';
 import finalurdu from '../assests/finalurdu.mp4';
 import learnbg from '../assests/learn_bg.png';
-import cartoon from '../assests/finalgif.gif';
+import cartoon from '../assests/finallion.gif';
 import board from '../assests/board.png';
 import brown from '../assests/brown_board.png';
 import star1 from '../assests/1star.png';
@@ -28,6 +28,7 @@ function Final() {
   const { t } = useTranslation();
   const audioRef = useRef(null);
   const [starImg, setStarImg] = React.useState(star1);
+  const handleBack = () => navigate("/wonderworld");
 
   useEffect(() => {
     let voiceKey = "cookie_voice_tries";
@@ -83,7 +84,7 @@ function Final() {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -60 }}
       transition={{ duration: 0.3 }}
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "100vh", width: "100vw", overflow: "hidden" }}
     >
       <Box sx={{ cursor: `url(${click}) 122 122, auto` }}>
 
@@ -91,7 +92,7 @@ function Final() {
         <Box
           sx={{
             backgroundColor: "#0B3D2E",
-            width: "100%",
+            width: "100vw",
             height: "100vh",
             opacity: "0.9",
             position: "absolute",
@@ -103,9 +104,10 @@ function Final() {
         <Box
           sx={{
             backgroundImage: `url(${learnbg})`,
-            width: "100%",
-            height: { lg: "733px", sm: "100vh" },
-            borderRadius: { lg: "35px", sm: "0px" },
+            width: "100vw",
+            minHeight: "100vh",
+            height: "100vh",
+            borderRadius: "0px",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             position: "relative",
@@ -118,7 +120,7 @@ function Final() {
             <Box
               component="img"
               src={bg}
-              onClick={() => navigate("/wonderworld")}
+              onClick={handleBack}
               sx={{
                 width: { lg: "9%", sm: "18%" },
                 marginLeft: { lg: "12%", sm: "10%" },
@@ -129,7 +131,7 @@ function Final() {
             />
 
             <Typography
-              onClick={() => navigate("/wonderworld")}
+              onClick={handleBack}
               sx={{
                 fontSize: {
                   lg: i18n.language === "ur" ? "37px" : "35px",
@@ -239,7 +241,7 @@ function Final() {
       width: { lg: "150px", sm: "120px" },
       height: { lg: "70px", sm: "55px" },
       marginTop: { lg: "-36.5%", sm: "-48%" },
-            marginLeft: { lg: "61%", sm: "62%" },
+            marginLeft: { lg: "65%", sm: "66%" },
       cursor: `url(${click}) 12 12, auto`,
      
     }}
@@ -253,8 +255,8 @@ function Final() {
         sm: i18n.language === "ur" ? "28px" : "24px",
       },
       marginLeft: {
-        lg: i18n.language === "ur" ? "62.3%" : "62.3%",
-        sm: i18n.language === "ur" ? "64.2%" : "63%",
+        lg: i18n.language === "ur" ? "66.3%" : "66.3%",
+        sm: i18n.language === "ur" ? "68.2%" : "67%",
       },
       marginTop: {
         lg: "-21%",
