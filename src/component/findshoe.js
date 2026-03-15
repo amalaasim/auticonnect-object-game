@@ -173,7 +173,7 @@ const noAudioRef = useRef(null);
     yesAudioRef.current.volume = 1;
     yesAudioRef.current.play().catch(() => console.log("Yes autoplay blocked"));
     setTimeout(() => {
-      navigate("/final", { state: { from: "findball" } });
+      navigate("/final", { state: { from: "findshoe" } });
     }, 5000);
   } else {
     // Car or Cookie selected → play NO audio
@@ -188,7 +188,7 @@ const noAudioRef = useRef(null);
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -60 }}
       transition={{ duration: 0.3 }}
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "100vh", width: "100vw", overflow: "hidden" }}
     >
       <Box sx={{ cursor: `url(${click}) 122 122, auto` }}>
 
@@ -196,7 +196,7 @@ const noAudioRef = useRef(null);
         <Box
           sx={{
             backgroundColor: "#0B3D2E",
-            width: "100%",
+            width: "100vw",
             height: "100vh",
             opacity: "0.9",
             position: "absolute",
@@ -208,9 +208,10 @@ const noAudioRef = useRef(null);
         <Box
           sx={{
             backgroundImage: `url(${learnbg})`,
-            width: "100%",
-            height: { lg: "733px", sm: "100vh" },
-            borderRadius: { lg: "35px", sm: "0px" },
+            width: "100vw",
+            minHeight: "100vh",
+            height: "100vh",
+            borderRadius: "0px",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             position: "relative",
@@ -387,7 +388,7 @@ const noAudioRef = useRef(null);
               width: { lg: "112px", sm: "80px" },
               height: { lg: "112px", sm: "80px" },
               marginTop: { lg: "-48%", sm: "-72%" },
-              marginLeft: { lg: "-36%", sm: "50.5%" },
+              marginLeft: { lg: "calc(-36% - 25px)", sm: "50.5%" },
                             "&:hover": { transform: "scale(1.18)", boxShadow: "0 10px 25px rgba(0,0,0,0)" }
 
             }}
@@ -401,7 +402,7 @@ const noAudioRef = useRef(null);
               width: { lg: "152px", sm: "100px" },
               height: { lg: "152px", sm: "100px" },
               marginTop: { lg: "-47.5%", sm: "-72%" },
-              marginLeft: { lg: "2.8%", sm: "4%" },
+              marginLeft: { lg: "calc(2.8%)", sm: "4%" },
              "&:hover": { transform: "scale(1.18)", boxShadow: "0 10px 25px rgba(0,0,0,0)" }
 
             }}
@@ -415,16 +416,16 @@ const noAudioRef = useRef(null);
               width: { lg: "130px", sm: "100px" },
               height: { lg: "130px", sm: "100px" },
               marginTop: { lg: "-47.5%", sm: "-72%" },
-              marginLeft: { lg: "1.8%", sm: "2%" },
+              marginLeft: { lg: "calc(1.8%)", sm: "2%" },
                             "&:hover": { transform: "scale(1.18)", boxShadow: "0 10px 25px rgba(0,0,0,0)" }
 
             }}
           />
-       <Typography
+        <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
-               marginTop: {lg:i18n.language === "ur" ? "-19%" :"-18.6%",sm:i18n.language === "ur" ? "-30%" : "-30%"},
-               marginLeft: {lg:i18n.language === "ur" ? "53.5%" : "53%",sm:i18n.language === "ur" ? "53.5%" : "52.5%"}
+               marginTop: {lg:i18n.language === "ur" ? "calc(-19% - 10px)" :"calc(-18.6% - 10px)",sm:i18n.language === "ur" ? "-30%" : "-30%"},
+               marginLeft: {lg:i18n.language === "ur" ? "calc(53.5% + 40px)" : "calc(53% + 40px)",sm:i18n.language === "ur" ? "53.5%" : "52.5%"}
 ,               fontStyle:"normal",
                lineHeight:"90%",
                fontFamily:i18n.language === "ur" ? "JameelNooriNastaleeq" : 'Chewy',
@@ -438,7 +439,7 @@ opacity:"0.9",
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
                marginTop: {lg:i18n.language === "ur" ? "-2.69%" :"-2.1%",sm:i18n.language === "ur" ? "-3.3%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "65.5%" : "63.999%",sm:i18n.language === "ur" ? "69.5%" : "67%"},
+               marginLeft:{lg:i18n.language === "ur" ? "calc(65.5% + 45px)" : "calc(63.999% + 45px)",sm:i18n.language === "ur" ? "69.5%" : "67%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',
@@ -451,8 +452,8 @@ opacity:"0.9",
                <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "30px" : "23px"},
-              marginTop: {lg:i18n.language === "ur" ? "-1.7%" :"-1.89%",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "75.9%" : "74.9%",sm:i18n.language === "ur" ? "83.9%" : "84.2%"},
+              marginTop: {lg:i18n.language === "ur" ? "calc(-1.7% - 5px)" :"calc(-1.89% - 5px)",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
+               marginLeft:{lg:i18n.language === "ur" ? "calc(75.9% + 70px)" : "calc(74.9% + 70px)",sm:i18n.language === "ur" ? "83.9%" : "84.2%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "Jameelnoorinastaleeq" :'Chewy',
@@ -469,8 +470,8 @@ opacity:"0.9",
             sx={{
               width: { lg: "200px", sm: "200px" },
               height: { lg: "150px", sm: "150px" },
-              marginLeft: { lg: "60%", sm: "60%" },
-              marginTop: {lg:"-4%",sm:"-10%"}
+              marginLeft: { lg: "calc(60% - 50px)", sm: "60%" },
+              marginTop: {lg:"calc(-4% + 40px)",sm:"-10%"}
             }}
           />
 
@@ -479,17 +480,17 @@ opacity:"0.9",
               component="img"
               src={selectedImageSrc}
               sx={{
-                width: { lg: "120px", sm: "80px" },
-                height: { lg: "112px", sm: "70px" },
-                marginLeft: { lg:i18n.language==="ur"?"62.8%":"62.8%", sm: "66%" },
-                marginTop: {lg:i18n.language==="ur"?"-3.2%":"-3%",sm:"-6.5%"}
+                width: { lg: "160px", sm: "100px" },
+                height: { lg: "150px", sm: "90px" },
+                marginLeft: { lg:i18n.language==="ur"?"calc(62.8% + 20px)":"calc(62.8% + 20px)", sm: "66%" },
+                marginTop: {lg:i18n.language==="ur"?"calc(-3.2% - 70px)":"calc(-3% - 70px)",sm:"-6.5%"}
               }}
             />
           )}
 
-          <audio
+<audio
   ref={audioRef}
-  src={i18n.language === "ur" ? findurdu : Findshoe}
+  src={i18n.language === "ur" ? findurdu : findshoe}
   preload="auto"
 />
 

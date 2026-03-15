@@ -186,7 +186,7 @@ const noAudioRef = useRef(null);
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -60 }}
       transition={{ duration: 0.3 }}
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "100vh", width: "100vw", overflow: "hidden" }}
     >
       <Box sx={{ cursor: `url(${click}) 122 122, auto` }}>
 
@@ -194,7 +194,7 @@ const noAudioRef = useRef(null);
         <Box
           sx={{
             backgroundColor: "#0B3D2E",
-            width: "100%",
+            width: "100vw",
             height: "100vh",
             opacity: "0.9",
             position: "absolute",
@@ -206,9 +206,10 @@ const noAudioRef = useRef(null);
         <Box
           sx={{
             backgroundImage: `url(${learnbg})`,
-            width: "100%",
-            height: { lg: "733px", sm: "100vh" },
-            borderRadius: { lg: "35px", sm: "0px" },
+            width: "100vw",
+            minHeight: "100vh",
+            height: "100vh",
+            borderRadius: "0px",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             position: "relative",
@@ -384,7 +385,7 @@ const noAudioRef = useRef(null);
               width: { lg: "132px", sm: "90px" },
               height: { lg: "132px", sm: "90px" },
               marginTop: { lg: "-47%", sm: "-71.5%" },
-              marginLeft: { lg: "-36.5%", sm: "49.5%" },
+              marginLeft: { lg: "calc(-36.5% - 30px)", sm: "49.5%" },
                             "&:hover": { transform: "scale(1.18)", boxShadow: "0 10px 25px rgba(0,0,0,0)" }
 
             }}
@@ -398,7 +399,7 @@ const noAudioRef = useRef(null);
               width: { lg: "132px", sm: "90px" },
               height: { lg: "132px", sm: "90px" },
               marginTop: { lg: "-47.5%", sm: "-72%" },
-              marginLeft: { lg: "2.5%", sm: "4%" },
+              marginLeft: { lg: "calc(2.5% + 5px)", sm: "4%" },
                             "&:hover": { transform: "scale(1.18)", boxShadow: "0 10px 25px rgba(0,0,0,0)" }
 
             }}
@@ -412,7 +413,7 @@ const noAudioRef = useRef(null);
               width: { lg: "120px", sm: "80px" },
               height: { lg: "120px", sm: "80px" },
               marginTop: { lg: "-47.5%", sm: "-72%" },
-              marginLeft: { lg: "3%", sm: "4.3%" },
+              marginLeft: { lg: "calc(3% + 5px)", sm: "4.3%" },
                             "&:hover": { transform: "scale(1.18)", boxShadow: "0 10px 25px rgba(0,0,0,0)" }
 
             }}
@@ -420,8 +421,8 @@ const noAudioRef = useRef(null);
        <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
-               marginTop: {lg:i18n.language === "ur" ? "-19%" :"-18.6%",sm:i18n.language === "ur" ? "-30%" : "-30%"},
-               marginLeft: {lg:i18n.language === "ur" ? "53.5%" : "53.3%",sm:i18n.language === "ur" ? "53.5%" : "52.5%"}
+               marginTop: {lg:i18n.language === "ur" ? "calc(-19% - 10px)" :"calc(-18.6% - 10px)",sm:i18n.language === "ur" ? "-30%" : "-30%"},
+               marginLeft: {lg:i18n.language === "ur" ? "calc(53.5% + 40px)" : "calc(53.3% + 40px)",sm:i18n.language === "ur" ? "53.5%" : "52.5%"}
 ,               fontStyle:"normal",
                lineHeight:"90%",
                fontFamily:i18n.language === "ur" ? "JameelNooriNastaleeq" : 'Chewy',
@@ -431,11 +432,11 @@ opacity:"0.9",
              }}>
              {t("ball")}
               </Typography> 
-        <Typography
+               <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
                marginTop: {lg:i18n.language === "ur" ? "-2.69%" :"-2.1%",sm:i18n.language === "ur" ? "-3.3%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "65.5%" : "64.999%",sm:i18n.language === "ur" ? "69.5%" : "67%"},
+               marginLeft:{lg:i18n.language === "ur" ? "calc(65.5% + 40px)" : "calc(64.999% + 40px)",sm:i18n.language === "ur" ? "69.5%" : "67%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',
@@ -448,8 +449,8 @@ opacity:"0.9",
                <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "30px" : "23px"},
-              marginTop: {lg:i18n.language === "ur" ? "-1.7%" :"-1.89%",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "75.9%" : "74.6%",sm:i18n.language === "ur" ? "83.9%" : "82.2%"},
+              marginTop: {lg:i18n.language === "ur" ? "calc(-1.7% - 2px)" :"calc(-1.89% - 2px)",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
+               marginLeft:{lg:i18n.language === "ur" ? "calc(75.9% + 50px)" : "calc(74.6% + 50px)",sm:i18n.language === "ur" ? "83.9%" : "82.2%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "Jameelnoorinastaleeq" :'Chewy',
@@ -476,10 +477,11 @@ opacity:"0.9",
               component="img"
               src={selectedImageSrc}
               sx={{
-                width: { lg: "120px", sm: "80px" },
-                height: { lg: "112px", sm: "70px" },
-                marginLeft: { lg: "62.8%", sm: "66%" },
-                marginTop: {lg:"-22.2%",sm:"-27.5%"}
+                width: { lg: selectedImageSrc === ball ? "112px" : "120px", sm: selectedImageSrc === ball ? "74px" : "80px" },
+                height: { lg: selectedImageSrc === ball ? "112px" : "112px", sm: selectedImageSrc === ball ? "74px" : "70px" },
+                marginLeft: { lg: "calc(62.8% + 45px)", sm: "66%" },
+                marginTop: {lg:"calc(-22.2% - 20px)",sm:"-27.5%"},
+                objectFit: "contain"
               }}
             />
           )}

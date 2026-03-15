@@ -499,12 +499,22 @@ function Learnobjball() {
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript.toLowerCase();
-        const normalized = transcript.replace(/\s/g, "");
-        const matches =
-          normalized.includes("gaind") ||
-          normalized.includes("gaen") ||
-          normalized.includes("gaind") ||
-          normalized.includes("گیند");
+        const normalized = transcript.replace(/[\s\-_.']/g, "");
+        const variants = [
+          "ball",
+          "bal",
+          "boll",
+          "bawl",
+          "bol",
+          "baal",
+          "gaind",
+          "gaen",
+          "gain",
+          "gand",
+          "گیند",
+          "گیندا",
+        ];
+        const matches = variants.some((v) => normalized.includes(v));
         incrementVoiceTries();
         setSpeechStatus(`Heard: ${transcript}`);
         if (matches) {
@@ -637,6 +647,8 @@ useEffect(() => {
      style={{
        minHeight: "100vh",
        backgroundColor: "transparent",
+       width: "100vw",
+       overflow: "hidden",
      }}
    >
      <Box
@@ -649,8 +661,8 @@ useEffect(() => {
       <Box
         sx={{
           backgroundColor: "#0B3D2E",
-          width: "100%",
-          height: "733px",
+          width: "100vw",
+          height: "100vh",
           opacity: "0.9",
           position: "absolute",
           backgroundAttachment: "fixed",
@@ -660,8 +672,9 @@ useEffect(() => {
       <Box
         sx={{
           backgroundImage: `url(${learnbg})`,
-          width: "100%",
-          height: "733px",
+          width: "100vw",
+          minHeight: "100vh",
+          height: "100vh",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
@@ -786,8 +799,8 @@ opacity:"0.9",
 opacity:"0.9", }}>{t("sayBall")}</Typography> 
         <Box component='img' sx={{ width: {lg:"518px",sm:"40%"}, height: {lg:"300px",sm:"22%"}, marginLeft: {lg:"780px",sm:"49%"}, marginTop: "1.8%" }} src={brown} />
         <Box component='img' sx={{ width:{lg:"300px",sm:"150px"}, height: {lg:"300px",sm:"150px"}, marginLeft: {lg:"736px",sm:"46%"}, marginTop: {lg:"-18%",sm:"-20%"} }} src={half} />
-        <Box component='img' sx={{ width:{lg:"180px",sm:"100px"}, height: {lg:"190px",sm:"100px"}, marginLeft: {lg:"63%",sm:"62%"}, marginTop: {lg:"-32%",sm:"-38%"} }} src={full} />
-        <Box component='img' sx={{ width:{lg:"150px",sm:"80px"}, height: {lg:"150px",sm:"80px"}, marginLeft: {lg:"74%",sm:"75%"}, marginTop: {lg:"-22%",sm:"-30%"} }} src={three} />
+        <Box component='img' sx={{ width:{lg:"180px",sm:"100px"}, height: {lg:"190px",sm:"100px"}, marginLeft: {lg:"calc(63% + 30px)",sm:"62%"}, marginTop: {lg:"calc(-32% - 20px)",sm:"-38%"} }} src={full} />
+        <Box component='img' sx={{ width:{lg:"150px",sm:"80px"}, height: {lg:"150px",sm:"80px"}, marginLeft: {lg:"calc(74% + 30px)",sm:"75%"}, marginTop: {lg:"calc(-22% - 10px)",sm:"-30%"} }} src={three} />
         <Box component='img' sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"940px",sm:"60%"}, marginTop: {lg:"-12.5%",sm:"-24%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={stop} />
         <Box component='img' sx={{ width: {lg:"65px",sm:"40px"}, height: {lg:"65px",sm:"40px"}, marginLeft: {lg:"1007px",sm:"66%"}, marginTop: {lg:"-16%",sm:"-30%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={pause} />
         <Box component='img' sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"1087px",sm:"73%"}, marginTop: {lg:"-18.9%",sm:"-36%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={retry} />

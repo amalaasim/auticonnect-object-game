@@ -51,16 +51,24 @@ function Final() {
   useEffect(() => {
     let voiceKey = "cookie_voice_tries";
     let selectKey = "cookie_select_tries";
+    let recentStarKey = "cookie";
+    let uploadKey = "uploadedCookie";
 
     if (location.state?.from === "findcar") {
       voiceKey = "car_voice_tries";
       selectKey = "car_select_tries";
+      recentStarKey = "car";
+      uploadKey = "uploadedCar";
     } else if (location.state?.from === "findball") {
       voiceKey = "ball_voice_tries";
       selectKey = "ball_select_tries";
+      recentStarKey = "ball";
+      uploadKey = "uploadedball";
     } else if (location.state?.from === "findshoe") {
       voiceKey = "shoe_voice_tries";
       selectKey = "shoe_select_tries";
+      recentStarKey = "shoe";
+      uploadKey = "uploadedShoe";
     }
 
     const voiceTries = parseInt(localStorage.getItem(voiceKey) || "0", 10);
@@ -68,10 +76,29 @@ function Final() {
     const totalTries = voiceTries + selectTries;
     const successCount = 3; // two voice steps + one selection
     const percent = totalTries > 0 ? Math.round((successCount / totalTries) * 100) : 0;
+    let starCount = 1;
 
-    if (percent <= 33) setStarImg(star1);
-    else if (percent <= 66) setStarImg(star2);
-    else setStarImg(star3);
+    if (percent <= 33) {
+      setStarImg(star1);
+      starCount = 1;
+    } else if (percent <= 66) {
+      setStarImg(star2);
+      starCount = 2;
+    } else {
+      setStarImg(star3);
+      starCount = 3;
+    }
+
+    try {
+      const raw = localStorage.getItem("ww_recent_stars");
+      const current = raw ? JSON.parse(raw) : {};
+      localStorage.setItem(
+        "ww_recent_stars",
+        JSON.stringify({ ...current, [recentStarKey]: starCount })
+      );
+    } catch (_) {}
+
+    localStorage.removeItem(uploadKey);
   }, []);
 
   useEffect(() => {

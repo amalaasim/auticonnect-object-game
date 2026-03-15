@@ -501,12 +501,22 @@ const listenForShoe = () => {
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript.toLowerCase();
-      const normalized = transcript.replace(/\s/g, "");
-      const matches =
-        normalized.includes("jootay") ||
-        normalized.includes("jootay") ||
-        normalized.includes("jوتے") ||
-        normalized.includes("جوتے");
+      const normalized = transcript.replace(/[\s\-_.']/g, "");
+      const variants = [
+        "shoe",
+        "shoes",
+        "sho",
+        "show",
+        "shoo",
+        "shu",
+        "joota",
+        "joota",
+        "jootay",
+        "jootay",
+        "جوتا",
+        "جوتے",
+      ];
+      const matches = variants.some((v) => normalized.includes(v));
       incrementVoiceTries();
       setSpeechStatus(`Heard: ${transcript}`);
       if (matches) {
@@ -786,9 +796,9 @@ opacity:"0.9",
                color:"rgba(130, 77, 31, 1)",
 opacity:"0.9", }}>{t("sayShoes")}</Typography> 
         <Box component='img' sx={{ width: {lg:"518px",sm:"40%"}, height: {lg:"300px",sm:"22%"}, marginLeft: {lg:"780px",sm:"49%"}, marginTop: "1.8%" }} src={brown} />
-        <Box component='img' sx={{ width:{lg:"200px",sm:"110px"}, height: {lg:"200px",sm:"100px"}, marginLeft: {lg:"770px",sm:"49%"}, marginTop: {lg:"-18%",sm:"-20%"} }} src={half} />
-        <Box component='img' sx={{ width:{lg:"200px",sm:"120px"}, height: {lg:"200px",sm:"130px"}, marginLeft: {lg:"62.5%",sm:"61.5%"}, marginTop: {lg:"-32%",sm:"-38%"} }} src={full} />
-        <Box component='img' sx={{ width:{lg:"200px",sm:"90px"}, height: {lg:"180px",sm:"90px"}, marginLeft: {lg:"72%",sm:"75%"}, marginTop: {lg:"-20%",sm:"-30%"} }} src={three} />
+        <Box component='img' sx={{ width:{lg:"200px",sm:"110px"}, height: {lg:"200px",sm:"100px"}, marginLeft: {lg:"800px",sm:"49%"}, marginTop: {lg:"-18%",sm:"-20%"} }} src={half} />
+        <Box component='img' sx={{ width:{lg:"200px",sm:"120px"}, height: {lg:"200px",sm:"130px"}, marginLeft: {lg:"calc(62.5% + 50px)",sm:"61.5%"}, marginTop: {lg:"calc(-32% - 35px)",sm:"-38%"} }} src={full} />
+        <Box component='img' sx={{ width:{lg:"200px",sm:"90px"}, height: {lg:"180px",sm:"90px"}, marginLeft: {lg:"calc(72% + 45px)",sm:"75%"}, marginTop: {lg:"calc(-20% - 10px)",sm:"-30%"} }} src={three} />
         <Box component='img' sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"940px",sm:"60%"}, marginTop: {lg:"-12.5%",sm:"-24%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={stop} />
         <Box component='img' sx={{ width: {lg:"65px",sm:"40px"}, height: {lg:"65px",sm:"40px"}, marginLeft: {lg:"1007px",sm:"66%"}, marginTop: {lg:"-16%",sm:"-30%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={pause} />
         <Box component='img' sx={{ width: {lg:"50px",sm:"30px"}, height: {lg:"50px",sm:"30px"}, marginLeft: {lg:"1087px",sm:"73%"}, marginTop: {lg:"-18.9%",sm:"-36%"}, "&:hover": { transform: "scale(1.28)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={retry} />

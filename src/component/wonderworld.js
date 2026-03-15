@@ -113,12 +113,15 @@ useEffect(() => {
 
           {/* Select object title */}
           <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Box component='img' sx={{ marginLeft: {lg:"620px",sm:"32%"}, marginTop: "30px", width: "350px", height: "70px", "&:hover": { transform: "scale(1.08)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={backbg} />
+            <Box component='img' sx={{ marginLeft: {lg:"620px",sm:"32%"}, marginTop: "70px", width: "350px", height: "70px", "&:hover": { transform: "scale(1.08)", boxShadow: "0 10px 25px rgba(0,0,0,0)" } }} src={backbg} />
             <Typography sx={{
-              fontSize: i18n.language === "ur" ? "45px" : "33px",
+              fontSize: i18n.language === "ur" ? "38px" : "33px",
               marginTop: {lg:i18n.language === "ur" ? "-4.4%" :"-4%",sm:i18n.language === "ur" ? "-8.3%" :"-7%"},
               paddingTop: "0.5%",
-              marginLeft: {lg:"45%",sm:"39%"},
+              marginLeft: {
+                lg: i18n.language === "ur" ? "calc(45% - 5px)" : "45%",
+                sm: i18n.language === "ur" ? "calc(39% - 5px)" : "39%",
+              },
               fontStyle: "normal",
               lineHeight: "90%",
               fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'chewy',
@@ -213,7 +216,7 @@ useEffect(() => {
             <Typography sx={{ fontSize: i18n.language === "ur" ? "60px" : "65px", marginTop: {lg:"3%",sm:"8%"}, marginLeft: {lg:"-36%",sm:i18n.language === "ur" ? "-50%":"-50%"}, fontStyle: "normal", lineHeight: "90%", fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy', letterSpacing: "1px", color: "rgb(15, 21, 27,0.8)", "&:hover": { transform: "scale(1.08)", boxShadow: "0 10px 25px rgba(0,0,0,0)" }, opacity: "0.9" }}>
               {t("back")}
             </Typography>
-            <Box component="img" sx={{ width: {lg:"285px",sm:"233px"}, height: "275px", marginLeft: {lg:"500px",sm:"330px"}, marginTop: {lg:"-31px",sm:"-10px"} }} src={end} />
+            <Box component="img" sx={{ width: {lg:"305px",sm:"248px"}, height: "275px", marginLeft: {lg:"500px",sm:"330px"}, marginTop: {lg:"-28px",sm:"-7px"}, objectFit: "contain" }} src={end} />
           </Box>
 
           {/* Audio element */}

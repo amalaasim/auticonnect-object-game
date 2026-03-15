@@ -131,11 +131,20 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "en",         
+    lng:
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("app_language") || "en"
+        : "en",
     fallbackLng: "en",
     interpolation: {
       escapeValue: false
     }
   });
+
+i18n.on("languageChanged", (lng) => {
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem("app_language", lng);
+  }
+});
 
 export default i18n;

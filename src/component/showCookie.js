@@ -66,7 +66,7 @@ useEffect(() => {
       let resolved = false;
       cancelListenRef.current = false;
       const targetWord = i18n.language === "ur" ? "biscuit" : "cookie";
-      const recognitionLang = i18n.language === "ur" ? "ur-PK" : "en-US";
+      const recognitionLang = "en-US";
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -78,25 +78,41 @@ useEffect(() => {
 
       const recognition = new SpeechRecognition();
       recognition.lang = recognitionLang;
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 5;
       recognition.continuous = false;
 
-      const startListening = () => {
+      const ensureMicPermission = async () => {
+        if (!navigator.mediaDevices?.getUserMedia) return true;
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach((track) => track.stop());
+          return true;
+        } catch (_) {
+          setSpeechStatus("Microphone permission blocked.");
+          return false;
+        }
+      };
+
+      const startListening = async () => {
         if (retryListenRef.current) {
           clearTimeout(retryListenRef.current);
           retryListenRef.current = null;
         }
         setSpeechVerified(false);
         setSpeechStatus(`Listening… say “${targetWord}”`);
+        const hasPermission = await ensureMicPermission();
+        if (!hasPermission) return;
         try {
           recognition.start();
         } catch (_) {}
       };
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        const normalized = transcript.replace(/[\s\-_.']/g, "");
+        const transcripts = Array.from(event.results || []).flatMap((result) =>
+          Array.from(result || []).map((item) => item.transcript.toLowerCase())
+        );
+        const transcript = transcripts[0] || "";
         const variants = [
           "cookie",
           "cooki",
@@ -104,13 +120,17 @@ useEffect(() => {
           "kookie",
           "biscuit",
           "biscut",
-          "biscut",
           "biskit",
           "biskut",
-          "biskit",
           "biscoot",
           "biscuet",
           "bisquite",
+          "biskoot",
+          "biscot",
+          "baskit",
+          "biskat",
+          "biscat",
+          "biscuitt",
           "بسکٹ",
           "بسکِٹ",
           "بِسکٹ",
@@ -119,8 +139,33 @@ useEffect(() => {
           "بِسکِت",
           "بِسکِٹ",
           "بسکُٹ",
+          "بسکٹٹ",
+          "بِسکُٹ",
+          "بیسکِٹ",
+          "بسکٹا",
+          "بسکٹو",
         ];
-        const matches = variants.some((v) => normalized.includes(v));
+        const matches = transcripts.some((value) => {
+          const normalized = value.replace(/[\s\-_.']/g, "");
+          const words = value
+            .split(/\s+/)
+            .map((word) => word.replace(/[^a-z\u0600-\u06ff]/gi, "").toLowerCase())
+            .filter(Boolean);
+
+          if (variants.some((v) => normalized.includes(v) || words.includes(v))) {
+            return true;
+          }
+
+          return words.some((word) => {
+            if (word.length > 8) return false;
+            if (/^cook/.test(word)) return true;
+            if (/^bisc/.test(word)) return true;
+            if (/^bisk/.test(word)) return true;
+            if (/^بسک/.test(word)) return true;
+            if (/^بِسک/.test(word)) return true;
+            return false;
+          });
+        });
         setSpeechStatus(`Heard: ${transcript}`);
         if (matches) {
           setSpeechVerified(true);
