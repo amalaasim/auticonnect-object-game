@@ -334,7 +334,11 @@ const noAudioRef = useRef(null);
                 },
                 marginTop: { lg: "-8.5%", sm: "-13%" },
                 marginLeft: { lg: "28.5%", sm: "13%" },
-                width: { lg: "15%", sm: "25%" },
+                width: {
+                  lg: i18n.language === "ur" ? "22%" : "15%",
+                  sm: i18n.language === "ur" ? "38%" : "25%",
+                },
+                whiteSpace: i18n.language === "ur" ? "nowrap" : "normal",
                 fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" : "Chewy",
                 color: "rgba(15,21,27,0.8)",
               }}
@@ -424,7 +428,7 @@ const noAudioRef = useRef(null);
         <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
-               marginTop: {lg:i18n.language === "ur" ? "calc(-19% - 10px)" :"calc(-18.6% - 10px)",sm:i18n.language === "ur" ? "-30%" : "-30%"},
+               marginTop: {lg:i18n.language === "ur" ? "calc(-19%)" :"calc(-18.6% - 10px)",sm:i18n.language === "ur" ? "-30%" : "-30%"},
                marginLeft: {lg:i18n.language === "ur" ? "calc(53.5% + 40px)" : "calc(53% + 40px)",sm:i18n.language === "ur" ? "53.5%" : "52.5%"}
 ,               fontStyle:"normal",
                lineHeight:"90%",
@@ -439,7 +443,7 @@ opacity:"0.9",
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
                marginTop: {lg:i18n.language === "ur" ? "-2.69%" :"-2.1%",sm:i18n.language === "ur" ? "-3.3%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "calc(65.5% + 45px)" : "calc(63.999% + 45px)",sm:i18n.language === "ur" ? "69.5%" : "67%"},
+               marginLeft:{lg:i18n.language === "ur" ? "calc(65.5% + 35px)" : "calc(63.999% + 45px)",sm:i18n.language === "ur" ? "69.5%" : "67%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',
@@ -452,8 +456,8 @@ opacity:"0.9",
                <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "30px" : "23px"},
-              marginTop: {lg:i18n.language === "ur" ? "calc(-1.7% - 5px)" :"calc(-1.89% - 5px)",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
-               marginLeft:{lg:i18n.language === "ur" ? "calc(75.9% + 70px)" : "calc(74.9% + 70px)",sm:i18n.language === "ur" ? "83.9%" : "84.2%"},
+              marginTop: {lg:i18n.language === "ur" ? "calc(-1.7% - 10px)" :"calc(-1.89% - 5px)",sm:i18n.language === "ur" ? "-2.9%" : "-2.7%"},
+               marginLeft:{lg:i18n.language === "ur" ? "calc(75.9% + 60px)" : "calc(74.9% + 70px)",sm:i18n.language === "ur" ? "83.9%" : "84.2%"},
                fontStyle:"normal",
                lineHeight:"90%",
                fontFamily: i18n.language === "ur" ? "Jameelnoorinastaleeq" :'Chewy',

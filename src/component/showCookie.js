@@ -64,6 +64,7 @@ useEffect(() => {
   const listenForCookie = () =>
     new Promise((resolve, reject) => {
       let resolved = false;
+      let attemptCounted = false;
       cancelListenRef.current = false;
       const targetWord = i18n.language === "ur" ? "biscuit" : "cookie";
       const recognitionLang = "en-US";
@@ -167,6 +168,9 @@ useEffect(() => {
           });
         });
         setSpeechStatus(`Heard: ${transcript}`);
+        if (!attemptCounted) {
+          attemptCounted = true;
+        }
         if (matches) {
           setSpeechVerified(true);
           speechVerifiedRef.current = true;
@@ -185,8 +189,22 @@ useEffect(() => {
         }
       };
 
-      recognition.onerror = () => {
-        setSpeechStatus("Couldn't hear you. Try again.");
+      recognition.onerror = (event) => {
+        const error = event?.error || "unknown";
+        if (error === "aborted") return;
+        if (error === "no-speech") {
+          setSpeechStatus(`Listening… say “${targetWord}”`);
+          return;
+        }
+        if (error === "audio-capture") {
+          setSpeechStatus("Microphone not available.");
+          return;
+        }
+        if (error === "not-allowed") {
+          setSpeechStatus("Microphone permission blocked.");
+          return;
+        }
+        setSpeechStatus(`Speech error: ${error}`);
       };
 
       recognition.onend = () => {
@@ -360,12 +378,13 @@ useEffect(() => {
             <Typography
               sx={{
                 fontSize: {
-                  lg: i18n.language === "ur" ? "46px" : "33px",
-                  sm: i18n.language === "ur" ? "40px" : "30px",
+                  lg: i18n.language === "ur" ? "40px" : "33px",
+                  sm: i18n.language === "ur" ? "34px" : "30px",
                 },
                 marginTop: {lg: i18n.language === "ur" ? "-8.3%" :"-9%",sm: i18n.language === "ur" ? "-14.8%" :"-15.5%"},
-                marginLeft:{lg: i18n.language === "ur" ? "25.1%" :"26%",sm: i18n.language === "ur" ? "19%" :"18%"},
-                width:{lg:i18n.language==="ur"?"15%":"15%",sm:i18n.language==="ur"?"25%":"25%"},
+                marginLeft:{lg: i18n.language === "ur" ? "calc(25.1% + 5px)" :"26%",sm: i18n.language === "ur" ? "calc(19% + 5px)" :"18%"},
+                width:{lg:i18n.language==="ur"?"20%":"15%",sm:i18n.language==="ur"?"35%":"25%"},
+                whiteSpace: i18n.language === "ur" ? "nowrap" : "normal",
                 fontFamily:
                   i18n.language === "ur"
                     ? "JameelNooriNastaleeq"

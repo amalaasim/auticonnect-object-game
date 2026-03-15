@@ -479,8 +479,8 @@ const playAndWait = (audio) => {
     return new Promise((resolve, reject) => {
       let resolved = false;
       cancelListenRef.current = false;
-      const targetWord = i18n.language === "ur" ? "gari" : "car";
-      const recognitionLang = i18n.language === "ur" ? "ur-PK" : "en-US";
+      const targetWord = i18n.language === "ur" ? "gaari" : "car";
+      const recognitionLang = "en-US";
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -527,6 +527,14 @@ const playAndWait = (audio) => {
           "kaar",
           "gari",
           "gaari",
+          "ghari",
+          "ghaari",
+          "ghaaree",
+          "ghari",
+          "ghaadi",
+          "gaady",
+          "garri",
+          "gaaree",
           "گاڑی",
           "گاڑي",
         ];
@@ -548,11 +556,13 @@ const playAndWait = (audio) => {
 
           // Short-word fallback for Safari mishearing "car" as close phonetics.
           return words.some((word) => {
-            if (word.length > 5) return false;
+            if (word.length > 7) return false;
             if (/^[ck].*(r|re|rr)$/.test(word)) return true;
             if (/^ca/.test(word)) return true;
             if (/^ka/.test(word)) return true;
             if (/^gar/i.test(word)) return true;
+            if (/^ghar/i.test(word)) return true;
+            if (/^gha/i.test(word)) return true;
             return false;
           });
         });
@@ -894,8 +904,9 @@ opacity:"0.9",
              sx={{
                fontSize: i18n.language === "ur" ? "53px" : "33px",
                marginTop: {lg:i18n.language === "ur" ? "-6.8%" : "-7.5%",sm:i18n.language === "ur" ? "-14%" : "-15%"},
-               width:{lg:i18n.language === "ur" ? "18%":"15%",sm:"35%"},
+               width:{lg:i18n.language === "ur" ? "22%":"15%",sm:i18n.language === "ur" ? "42%" : "35%"},
                marginLeft: {lg:i18n.language === "ur" ? "24.8%" : "25%",sm:i18n.language === "ur" ? "22%" : "22%"},
+               whiteSpace: i18n.language === "ur" ? "nowrap" : "normal",
                fontStyle:"normal",
                lineHeight:"38px",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',

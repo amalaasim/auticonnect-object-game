@@ -61,6 +61,7 @@ useEffect(() => {
 useEffect(() => {
   const listenForShoe = () =>
     new Promise((resolve, reject) => {
+      const targetWord = i18n.language === "ur" ? "jootay" : "shoes";
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -71,9 +72,9 @@ useEffect(() => {
       }
 
       const recognition = new SpeechRecognition();
-      recognition.lang = i18n.language === "ur" ? "ur-PK" : "en-US";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+      recognition.lang = "en-US";
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 5;
       recognition.continuous = false;
 
       const startListening = () => {
@@ -82,15 +83,17 @@ useEffect(() => {
           retryListenRef.current = null;
         }
         setSpeechVerified(false);
-        setSpeechStatus("Listening… say “shoes”");
+        setSpeechStatus(`Listening… say “${targetWord}”`);
         try {
           recognition.start();
         } catch (_) {}
       };
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        const normalized = transcript.replace(/[\s\-_.']/g, "");
+        const transcripts = Array.from(event.results || []).flatMap((result) =>
+          Array.from(result || []).map((item) => item.transcript.toLowerCase())
+        );
+        const transcript = transcripts[0] || "";
         const variants = [
           "shoe",
           "shoes",
@@ -100,15 +103,46 @@ useEffect(() => {
           "shu",
           "joota",
           "jootay",
+          "jootey",
+          "joote",
+          "jutay",
+          "jutey",
+          "jootae",
+          "jotay",
+          "jotey",
+          "jootie",
+          "juti",
+          "jooti",
+          "jootai",
           "جوتا",
           "جوتے",
         ];
-        const matches = variants.some((v) => normalized.includes(v));
+        const matches = transcripts.some((value) => {
+          const normalized = value.replace(/[\s\-_.']/g, "");
+          const words = value
+            .split(/\s+/)
+            .map((word) => word.replace(/[^a-z\u0600-\u06ff]/gi, "").toLowerCase())
+            .filter(Boolean);
+
+          if (variants.some((v) => normalized.includes(v) || words.includes(v))) {
+            return true;
+          }
+
+          return words.some((word) => {
+            if (word.length > 8) return false;
+            if (/^sho/.test(word)) return true;
+            if (/^shu/.test(word)) return true;
+            if (/^joo/.test(word)) return true;
+            if (/^jut/.test(word)) return true;
+            if (/^جو/.test(word)) return true;
+            return false;
+          });
+        });
         setSpeechStatus(`Heard: ${transcript}`);
         if (matches) {
           setSpeechVerified(true);
           speechVerifiedRef.current = true;
-          setSpeechStatus("Great! You said shoes.");
+          setSpeechStatus(`Great! You said ${targetWord}.`);
           if (retryListenRef.current) {
             clearTimeout(retryListenRef.current);
             retryListenRef.current = null;
@@ -118,7 +152,7 @@ useEffect(() => {
         } else {
           setSpeechVerified(false);
           speechVerifiedRef.current = false;
-          setSpeechStatus("Try again: say “shoes”.");
+          setSpeechStatus(`Try again: say “${targetWord}”.`);
         }
       };
 
@@ -286,12 +320,16 @@ useEffect(() => {
             <Typography
               sx={{
                 fontSize: {
-                  lg: i18n.language === "ur" ? "46px" : "33px",
-                  sm: i18n.language === "ur" ? "40px" : "30px",
+                  lg: i18n.language === "ur" ? "37px" : "33px",
+                  sm: i18n.language === "ur" ? "31px" : "30px",
                 },
                 marginTop: {lg: i18n.language === "ur" ? "-8.3%" :"-9%",sm: i18n.language === "ur" ? "-14.8%" :"-15.5%"},
-                marginLeft:{lg: i18n.language === "ur" ? "24.1%" :"26%",sm: i18n.language === "ur" ? "17%" :"18%"},
-                width:{lg:"15%",sm:"30%"},
+                marginLeft:{lg: i18n.language === "ur" ? "calc(24.1% + 20px)" :"26%",sm: i18n.language === "ur" ? "calc(17% + 20px)" :"18%"},
+                width:{
+                  lg: i18n.language === "ur" ? "22%" : "15%",
+                  sm: i18n.language === "ur" ? "42%" : "30%",
+                },
+                whiteSpace: i18n.language === "ur" ? "nowrap" : "normal",
                 fontFamily:
                   i18n.language === "ur"
                     ? "JameelNooriNastaleeq"

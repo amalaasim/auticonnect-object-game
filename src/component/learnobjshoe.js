@@ -470,6 +470,7 @@ const incrementVoiceTries = () => {
 
 const listenForShoe = () => {
   return new Promise((resolve, reject) => {
+    const targetWord = i18n.language === "ur" ? "jootay" : "shoes";
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -480,9 +481,9 @@ const listenForShoe = () => {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = i18n.language === "ur" ? "ur-PK" : "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 5;
     recognition.continuous = false;
 
     const startListening = () => {
@@ -491,7 +492,7 @@ const listenForShoe = () => {
         retryListenRef.current = null;
       }
       setSpeechVerified(false);
-      setSpeechStatus("Listening… say “shoes”");
+      setSpeechStatus(`Listening… say “${targetWord}”`);
       try {
         recognition.start();
       } catch (_) {
@@ -500,8 +501,10 @@ const listenForShoe = () => {
     };
 
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript.toLowerCase();
-      const normalized = transcript.replace(/[\s\-_.']/g, "");
+      const transcripts = Array.from(event.results || []).flatMap((result) =>
+        Array.from(result || []).map((item) => item.transcript.toLowerCase())
+      );
+      const transcript = transcripts[0] || "";
       const variants = [
         "shoe",
         "shoes",
@@ -510,19 +513,51 @@ const listenForShoe = () => {
         "shoo",
         "shu",
         "joota",
+        "jootay",
+        "jootey",
+        "joote",
+        "jutay",
+        "jutey",
         "joota",
-        "jootay",
-        "jootay",
+        "jootae",
+        "jotay",
+        "jotey",
+        "jootie",
+        "juti",
+        "jooti",
+        "joota",
+        "jootae",
+        "jootai",
         "جوتا",
         "جوتے",
       ];
-      const matches = variants.some((v) => normalized.includes(v));
+      const matches = transcripts.some((value) => {
+        const normalized = value.replace(/[\s\-_.']/g, "");
+        const words = value
+          .split(/\s+/)
+          .map((word) => word.replace(/[^a-z\u0600-\u06ff]/gi, "").toLowerCase())
+          .filter(Boolean);
+
+        if (variants.some((v) => normalized.includes(v) || words.includes(v))) {
+          return true;
+        }
+
+        return words.some((word) => {
+          if (word.length > 8) return false;
+          if (/^sho/.test(word)) return true;
+          if (/^shu/.test(word)) return true;
+          if (/^joo/.test(word)) return true;
+          if (/^jut/.test(word)) return true;
+          if (/^جو/.test(word)) return true;
+          return false;
+        });
+      });
       incrementVoiceTries();
       setSpeechStatus(`Heard: ${transcript}`);
       if (matches) {
         setSpeechVerified(true);
         speechVerifiedRef.current = true;
-        setSpeechStatus("Great! You said shoes.");
+        setSpeechStatus(`Great! You said ${targetWord}.`);
         if (retryListenRef.current) {
           clearTimeout(retryListenRef.current);
           retryListenRef.current = null;
@@ -532,7 +567,7 @@ const listenForShoe = () => {
       } else {
         setSpeechVerified(false);
         speechVerifiedRef.current = false;
-        setSpeechStatus("Try again: say “shoes”.");
+        setSpeechStatus(`Try again: say “${targetWord}”.`);
       }
     };
 
@@ -769,8 +804,9 @@ opacity:"0.9",
              sx={{
                fontSize: i18n.language === "ur" ? "53px" : "33px",
                marginTop: {lg:i18n.language === "ur" ? "-6.8%" : "-7.5%",sm:i18n.language === "ur" ? "-14%" : "-15%"},
-               width:{lg:i18n.language === "ur" ? "18%":"15%",sm:"35%"},
+               width:{lg:i18n.language === "ur" ? "22%":"15%",sm:i18n.language === "ur" ? "42%" : "35%"},
                marginLeft: {lg:i18n.language === "ur" ? "24.8%" : "25%",sm:i18n.language === "ur" ? "22%" : "22%"},
+               whiteSpace: i18n.language === "ur" ? "nowrap" : "normal",
                fontStyle:"normal",
                lineHeight:"38px",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',

@@ -39,8 +39,14 @@ function Final() {
       : starImg === star2
       ? {
           width: { lg: "290px", sm: "195px" },
-          marginLeft: { lg: "846px", sm: "55%" },
-          marginTop: { lg: "-47.8%", sm: "-63%" },
+          marginLeft: {
+            lg: i18n.language === "ur" ? "856px" : "846px",
+            sm: i18n.language === "ur" ? "calc(55% + 10px)" : "55%",
+          },
+          marginTop: {
+            lg: i18n.language === "ur" ? "calc(-47.8% - 60px)" : "-47.8%",
+            sm: i18n.language === "ur" ? "calc(-63% - 60px)" : "-63%",
+          },
         }
       : {
           width: { lg: "300px", sm: "200px" },
