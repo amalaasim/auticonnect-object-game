@@ -9,6 +9,7 @@ import half from '../assests/halfc.png';
 import three from '../assests/threec.png';
 import bg from '../assests/greenbg.png';
 import newgif from '../assests/he.gif';
+import standinglion from '../assests/standinglion.gif';
 import stop from '../assests/stop.png';
 import pause from '../assests/pause.png';
 import retry from '../assests/retry.png';
@@ -452,10 +453,15 @@ const cancelListenRef = useRef(false);
 const playAndWait = (audio) => {
   return new Promise((resolve) => {
     if (!audio || sequenceCancelRef.current) {
+      setIsLionSpeaking(false);
       resolve();
       return;
     }
-    audio.onended = () => resolve();
+    setIsLionSpeaking(true);
+    audio.onended = () => {
+      setIsLionSpeaking(false);
+      resolve();
+    };
     audio.play().catch(() => console.log("Autoplay blocked"));
   });
 };
@@ -464,6 +470,7 @@ const wait = (ms) => new Promise(res => setTimeout(res, ms));
 const [audioFinished, setAudioFinished] = useState(false);
 const [speechVerified, setSpeechVerified] = useState(false);
 const [speechStatus, setSpeechStatus] = useState("");
+const [isLionSpeaking, setIsLionSpeaking] = useState(false);
 const speechVerifiedRef = useRef(false);
 const [speechStep, setSpeechStep] = useState(1);
 
@@ -659,6 +666,7 @@ const playSequence = async () => {
     setAudioFinished(false);
     setSpeechVerified(false);
     setSpeechStatus("");
+    setIsLionSpeaking(false);
     setSpeechStep(1);
     autoAdvanceRef.current = false;
     audio1Ref.current.pause();
@@ -695,8 +703,10 @@ const playSequence = async () => {
     if (sequenceCancelRef.current) return;
 
     currentAudioRef.current = null;
+    setIsLionSpeaking(false);
     setAudioFinished(true);
   } catch (e) {
+    setIsLionSpeaking(false);
     console.log("Audio error", e);
   }
 };
@@ -776,6 +786,7 @@ const handleStop = () => {
   currentAudioRef.current = null;
   setSpeechVerified(false);
   setSpeechStatus("Stopped");
+  setIsLionSpeaking(false);
   setAudioFinished(false);
 };
 
@@ -949,7 +960,7 @@ opacity:"0.9",
              {t("repeatAfterMe")}
               </Typography> 
               </Box>
-          <Box component='img' sx={{ width: { lg: "451.59px",sm:"44%" }, height: {lg:"390.96px",sm:"52vh"}, marginTop: "-8px", marginLeft: {lg:"150px",sm:"-3%"}, borderRadius: "200.58px" }} src={newgif} />
+          <Box component='img' sx={{ width: { lg: "451.59px",sm:"44%" }, height: {lg:"390.96px",sm:"52vh"}, marginTop: "-8px", marginLeft: {lg:"150px",sm:"-3%"}, borderRadius: "200.58px" }} src={isLionSpeaking ? newgif : standinglion} />
         </Box>
 
         <Box component='img' sx={{ width: {lg:"658.94px",sm:"60%"}, height: {lg:"481px",sm:"40%"}, borderRadius: "44.5px", marginLeft: {lg:"723px",sm:"40%"}, marginTop: {lg:"-40%",sm:"-69%"} }} src={board} />

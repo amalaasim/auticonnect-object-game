@@ -5,6 +5,7 @@ import board from '../assests/board.png';
 import brown from '../assests/brown_board.png';
 import bg from '../assests/greenbg.png';
 import newgif from '../assests/finalgif.gif';
+import standinglion from '../assests/standinglion.gif';
 import stop from '../assests/stop.png';
 import pause from '../assests/pause.png';
 import retry from '../assests/retry.png';
@@ -27,14 +28,21 @@ export default function Show() {
   const audioRef = useRef(null);
   const recognitionRef = useRef(null);
   const retryListenRef = useRef(null);
+  const [isLionSpeaking, setIsLionSpeaking] = React.useState(false);
   const playAndWait = (audio) => {
     return new Promise((resolve) => {
       if (!audio) {
+        setIsLionSpeaking(false);
         resolve();
         return;
       }
-      audio.onended = () => resolve();
+      setIsLionSpeaking(true);
+      audio.onended = () => {
+        setIsLionSpeaking(false);
+        resolve();
+      };
       audio.play().catch(() => {
+        setIsLionSpeaking(false);
         setTimeout(() => {
           audio.play().catch(() => console.log("Autoplay blocked"));
         }, 1000);
@@ -176,6 +184,7 @@ useEffect(() => {
       if (!audio) return;
       setSpeechVerified(false);
       setSpeechStatus("");
+      setIsLionSpeaking(false);
       audio.pause();
       audio.currentTime = 0;
       audio.volume = 1;
@@ -196,6 +205,7 @@ useEffect(() => {
     try {
       recognitionRef.current?.stop();
     } catch (_) {}
+    setIsLionSpeaking(false);
   };
 }, [i18n.language]);
 
@@ -340,7 +350,7 @@ useEffect(() => {
               {t("your")}
             </Typography>
 
-            <Box component="img" src={newgif} sx={{ width:{lg:"390px",sm:"56%"}, ml: {lg:"150px",sm:"-10%"} }} />
+            <Box component="img" src={isLionSpeaking ? newgif : standinglion} sx={{ width:{lg:"390px",sm:"56%"}, ml: {lg:"150px",sm:"-10%"} }} />
           </Box>
 
           <Box component="img" src={board} sx={{ width: {lg:"659px",sm:"52%"}, ml: {lg:"723px",sm:"45%"}, mt: {lg:"-43%",sm:"-57%"} }} />

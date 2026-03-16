@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Box, Typography } from '@mui/material';
 import learnbg from '../assests/learn_bg.png';
 import cartoon from '../assests/finalgif.gif';
+import standinglion from '../assests/standinglion.gif';
 import board from '../assests/findbg.png';
 import { useEffect, useRef } from "react";
 import book from '../assests/book.png';
@@ -32,6 +33,7 @@ function Find() {
   const [selectedImageSrc, setSelectedImageSrc] = React.useState(null);
   const [cameraAllowed, setCameraAllowed] = React.useState(true);
   const [selectionRecorded, setSelectionRecorded] = React.useState(false);
+  const [isLionSpeaking, setIsLionSpeaking] = React.useState(false);
 
   const audioRef = useRef(null);
   const yesAudioRef = useRef(null);
@@ -55,6 +57,24 @@ function Find() {
       ["none", 0]
     )[0];
   }, [emotionCounts]);
+
+  const playTrackedAudio = React.useCallback((audio, options = {}) => {
+    const { onEnded, onError, resetTime = false } = options;
+    if (!audio) return;
+    if (resetTime) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    audio.onended = () => {
+      setIsLionSpeaking(false);
+      if (onEnded) onEnded();
+    };
+    setIsLionSpeaking(true);
+    audio.play().catch(() => {
+      setIsLionSpeaking(false);
+      if (onError) onError();
+    });
+  }, []);
 
   useEffect(() => {
   let permissionStatus = null;
@@ -80,17 +100,20 @@ function Find() {
   };
 }, []);
 
-  useEffect(() => {
+useEffect(() => {
   const audio = audioRef.current;
   if (audio) {
-    audio.pause();
-    audio.currentTime = 0;
     audio.volume = 1;
-    audio.play().catch(() => {
-      setTimeout(() => audio.play().catch(() => {}), 1000);
+    playTrackedAudio(audio, {
+      resetTime: true,
+      onError: () => {
+        setTimeout(() => {
+          playTrackedAudio(audio);
+        }, 1000);
+      },
     });
   }
-}, [i18n.language]);
+}, [i18n.language, playTrackedAudio]);
 
   useEffect(() => {
   const done = localStorage.getItem("cookie_select_done");
@@ -188,14 +211,15 @@ function Find() {
 
     if (audio) {
       audio.volume = 1;
-      audio.onended = () => {
-        if (navigateTimeoutRef.current) {
-          clearTimeout(navigateTimeoutRef.current);
-          navigateTimeoutRef.current = null;
-        }
-        navigateTimeoutRef.current = setTimeout(goNext, 2000);
-      };
-      audio.play().catch(() => {});
+      playTrackedAudio(audio, {
+        onEnded: () => {
+          if (navigateTimeoutRef.current) {
+            clearTimeout(navigateTimeoutRef.current);
+            navigateTimeoutRef.current = null;
+          }
+          navigateTimeoutRef.current = setTimeout(goNext, 2000);
+        },
+      });
 
       const durationMs =
         Number.isFinite(audio.duration) && audio.duration > 0
@@ -207,7 +231,7 @@ function Find() {
     }
   } else {
     noAudioRef.current.volume = 1;
-    noAudioRef.current.play().catch(() => {});
+    playTrackedAudio(noAudioRef.current);
   }
 };
 
@@ -383,7 +407,7 @@ function Find() {
           {/* cartoon */}
           <Box
             component="img"
-            src={cartoon}
+            src={isLionSpeaking ? cartoon : standinglion}
             sx={{
               width: { lg: "402px", sm: "270px" },
               height: { lg: "405px", sm: "290px" },

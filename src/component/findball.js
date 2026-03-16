@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Box,Typography } from '@mui/material';
 import learnbg from '../assests/learn_bg.png';
 import cartoon from '../assests/finalgif.gif';
+import standinglion from '../assests/standinglion.gif';
 import board from '../assests/findbg.png';
 import car from '../assests/carr.png';
 import ball from '../assests/red.png';
@@ -32,6 +33,7 @@ function Findball() {
   const [selectedImageSrc, setSelectedImageSrc] = React.useState(null);
   const [cameraAllowed, setCameraAllowed] = React.useState(true);
   const [selectionRecorded, setSelectionRecorded] = React.useState(false);
+  const [isLionSpeaking, setIsLionSpeaking] = React.useState(false);
  const audioRef = useRef(null);
 const yesAudioRef = useRef(null);
 const noAudioRef = useRef(null);
@@ -53,6 +55,24 @@ const noAudioRef = useRef(null);
       ["none", 0]
     )[0];
   }, [emotionCounts]);
+
+  const playTrackedAudio = React.useCallback((audio, options = {}) => {
+    const { onEnded, onError, resetTime = false } = options;
+    if (!audio) return;
+    if (resetTime) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    audio.onended = () => {
+      setIsLionSpeaking(false);
+      if (onEnded) onEnded();
+    };
+    setIsLionSpeaking(true);
+    audio.play().catch(() => {
+      setIsLionSpeaking(false);
+      if (onError) onError();
+    });
+  }, []);
 
   useEffect(() => {
   let permissionStatus = null;
@@ -80,14 +100,17 @@ const noAudioRef = useRef(null);
   useEffect(() => {
   const audio = audioRef.current;
   if (audio) {
-    audio.pause();
-    audio.currentTime = 0;
     audio.volume = 1;
-    audio.play().catch(() => {
-      setTimeout(() => audio.play().catch(() => {}), 1000);
+    playTrackedAudio(audio, {
+      resetTime: true,
+      onError: () => {
+        setTimeout(() => {
+          playTrackedAudio(audio);
+        }, 1000);
+      },
     });
   }
-}, [i18n.language]);
+}, [i18n.language, playTrackedAudio]);
 
   useEffect(() => {
   const done = localStorage.getItem("ball_select_done");
@@ -170,14 +193,18 @@ const noAudioRef = useRef(null);
     }
     // Ball selected → play YES audio then navigate after 2 sec
     yesAudioRef.current.volume = 1;
-    yesAudioRef.current.play().catch(() => console.log("Yes autoplay blocked"));
+    playTrackedAudio(yesAudioRef.current, {
+      onError: () => console.log("Yes autoplay blocked"),
+    });
     setTimeout(() => {
       navigate("/final", { state: { from: "findball" } });
     }, 5000);
   } else {
     // Car or Cookie selected → play NO audio
     noAudioRef.current.volume = 1;
-    noAudioRef.current.play().catch(() => console.log("No autoplay blocked"));
+    playTrackedAudio(noAudioRef.current, {
+      onError: () => console.log("No autoplay blocked"),
+    });
   }
 };
   return (
@@ -353,7 +380,7 @@ const noAudioRef = useRef(null);
           {/* cartoon */}
           <Box
             component="img"
-            src={cartoon}
+            src={isLionSpeaking ? cartoon : standinglion}
             sx={{
               width: { lg: "402px", sm: "270px" },
               height: { lg: "402px", sm: "290px" },
@@ -421,7 +448,7 @@ const noAudioRef = useRef(null);
        <Typography
              sx={{
                fontSize: {lg:i18n.language === "ur" ? "40px" :"35px",sm:i18n.language === "ur" ? "25px" : "25px"},
-               marginTop: {lg:i18n.language === "ur" ? "calc(-19% - 10px)" :"calc(-18.6% - 10px)",sm:i18n.language === "ur" ? "-30%" : "-30%"},
+               marginTop: {lg:i18n.language === "ur" ? "calc(-19% - 1px)" :"calc(-18.6% - 10px)",sm:i18n.language === "ur" ? "-30%" : "-30%"},
                marginLeft: {lg:i18n.language === "ur" ? "calc(53.5% + 40px)" : "calc(53.3% + 40px)",sm:i18n.language === "ur" ? "53.5%" : "52.5%"}
 ,               fontStyle:"normal",
                lineHeight:"90%",
@@ -480,7 +507,7 @@ opacity:"0.9",
                 width: { lg: selectedImageSrc === ball ? "112px" : "120px", sm: selectedImageSrc === ball ? "74px" : "80px" },
                 height: { lg: selectedImageSrc === ball ? "112px" : "112px", sm: selectedImageSrc === ball ? "74px" : "70px" },
                 marginLeft: { lg: "calc(62.8% + 45px)", sm: "66%" },
-                marginTop: {lg:"calc(-22.2% - 20px)",sm:"-27.5%"},
+                marginTop: {lg:"calc(-22.2% - 30px)",sm:"-27.5%"},
                 objectFit: "contain"
               }}
             />

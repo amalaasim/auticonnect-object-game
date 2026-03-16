@@ -7,7 +7,8 @@ import full from '../assests/red.png';
 import half from '../assests/balll.png';
 import three from '../assests/orange.png';
 import bg from '../assests/greenbg.png';
-import newgif from '../assests/finalgif.gif';
+import newgif from '../assests/he.gif';
+import standinglion from '../assests/standinglion.gif';
 import stop from '../assests/stop.png';
 import contin from '../assests/continue.png';
 import pause from '../assests/pause.png';
@@ -443,13 +444,23 @@ function Learnobjball() {
   const autoAdvanceRef = useRef(false);
   const playAndWait = (audio) => {
     return new Promise((resolve) => {
-      audio.onended = () => resolve();
+      if (!audio) {
+        setIsLionSpeaking(false);
+        resolve();
+        return;
+      }
+      setIsLionSpeaking(true);
+      audio.onended = () => {
+        setIsLionSpeaking(false);
+        resolve();
+      };
       audio.play().catch(() => console.log("Autoplay blocked"));
     });
   };
   const [audioFinished, setAudioFinished] = useState(false);
   const [speechVerified, setSpeechVerified] = useState(false);
   const [speechStatus, setSpeechStatus] = useState("");
+  const [isLionSpeaking, setIsLionSpeaking] = useState(false);
   const speechVerifiedRef = useRef(false);
   const [speechStep, setSpeechStep] = useState(1);
   
@@ -468,6 +479,7 @@ function Learnobjball() {
 
   const listenForBall = () => {
     return new Promise((resolve, reject) => {
+      const targetWord = i18n.language === "ur" ? "gaind" : "ball";
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -478,9 +490,9 @@ function Learnobjball() {
       }
 
       const recognition = new SpeechRecognition();
-      recognition.lang = i18n.language === "ur" ? "ur-PK" : "en-US";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+      recognition.lang = "en-US";
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 5;
       recognition.continuous = false;
 
       const startListening = () => {
@@ -489,7 +501,7 @@ function Learnobjball() {
           retryListenRef.current = null;
         }
         setSpeechVerified(false);
-        setSpeechStatus("Listening… say “ball”");
+        setSpeechStatus(`Listening… say “${targetWord}”`);
         try {
           recognition.start();
         } catch (_) {
@@ -498,8 +510,10 @@ function Learnobjball() {
       };
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        const normalized = transcript.replace(/[\s\-_.']/g, "");
+        const transcripts = Array.from(event.results || []).flatMap((result) =>
+          Array.from(result || []).map((item) => item.transcript.toLowerCase())
+        );
+        const transcript = transcripts[0] || "";
         const variants = [
           "ball",
           "bal",
@@ -511,16 +525,43 @@ function Learnobjball() {
           "gaen",
           "gain",
           "gand",
+          "gaindh",
+          "gainda",
+          "gaynd",
+          "gayn",
+          "ghaind",
+          "ghaenda",
           "گیند",
           "گیندا",
         ];
-        const matches = variants.some((v) => normalized.includes(v));
+        const matches = transcripts.some((value) => {
+          const normalized = value.replace(/[\s\-_.']/g, "");
+          const words = value
+            .split(/\s+/)
+            .map((word) => word.replace(/[^a-z\u0600-\u06ff]/gi, "").toLowerCase())
+            .filter(Boolean);
+
+          if (variants.some((v) => normalized.includes(v) || words.includes(v))) {
+            return true;
+          }
+
+          return words.some((word) => {
+            if (word.length > 7) return false;
+            if (/^ba/.test(word)) return true;
+            if (/^bo/.test(word)) return true;
+            if (/^gai/.test(word)) return true;
+            if (/^gay/.test(word)) return true;
+            if (/^gha/.test(word)) return true;
+            if (/^گی/.test(word)) return true;
+            return false;
+          });
+        });
         incrementVoiceTries();
         setSpeechStatus(`Heard: ${transcript}`);
         if (matches) {
           setSpeechVerified(true);
           speechVerifiedRef.current = true;
-          setSpeechStatus("Great! You said ball.");
+          setSpeechStatus(`Great! You said ${targetWord}.`);
           if (retryListenRef.current) {
             clearTimeout(retryListenRef.current);
             retryListenRef.current = null;
@@ -530,7 +571,7 @@ function Learnobjball() {
         } else {
           setSpeechVerified(false);
           speechVerifiedRef.current = false;
-          setSpeechStatus("Try again: say “ball”.");
+          setSpeechStatus(`Try again: say “${targetWord}”.`);
         }
       };
 
@@ -569,6 +610,7 @@ useEffect(() => {
       setAudioFinished(false);
       setSpeechVerified(false);
       setSpeechStatus("");
+      setIsLionSpeaking(false);
       setSpeechStep(1);
       autoAdvanceRef.current = false;
       audio1Ref.current.pause();
@@ -595,9 +637,11 @@ useEffect(() => {
 
       audio3Ref.current.volume = 1;
       await playAndWait(audio3Ref.current);
+      setIsLionSpeaking(false);
             setAudioFinished(true);
 
     } catch (e) {
+      setIsLionSpeaking(false);
       console.log("Audio error", e);
     }
   };
@@ -771,8 +815,9 @@ opacity:"0.9",
              sx={{
                fontSize: i18n.language === "ur" ? "53px" : "33px",
                marginTop: {lg:i18n.language === "ur" ? "-6.8%" : "-7.5%",sm:i18n.language === "ur" ? "-14%" : "-15%"},
-               width:{lg:i18n.language === "ur" ? "18%":"18%",sm:"35%"},
+               width:{lg:i18n.language === "ur" ? "22%":"18%",sm:i18n.language === "ur" ? "42%" : "35%"},
                marginLeft: {lg:i18n.language === "ur" ? "24.8%" : "25%",sm:i18n.language === "ur" ? "22%" : "22%"},
+               whiteSpace: i18n.language === "ur" ? "nowrap" : "normal",
                fontStyle:"normal",
                lineHeight:"38px",
                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" :'Chewy',
@@ -783,7 +828,7 @@ opacity:"0.9",
              {t("repeatAfterMeBall")}
               </Typography> 
               </Box>
-          <Box component='img' sx={{width: { lg: "400.59px",sm:"47%" }, height: {lg:"400.96px",sm:"52vh"}, marginTop: "-8px", marginLeft: {lg:"150px",sm:"-3%"}, borderRadius: "200.58px" }} src={newgif} />
+          <Box component='img' sx={{width: { lg: "400.59px",sm:"47%" }, height: {lg:"400.96px",sm:"52vh"}, marginTop: "-8px", marginLeft: {lg:"150px",sm:"-3%"}, borderRadius: "200.58px" }} src={isLionSpeaking ? newgif : standinglion} />
         </Box>
 
         <Box component='img' sx={{ width: {lg:"658.94px",sm:"60%"}, height: {lg:"481px",sm:"40%"}, borderRadius: "44.5px", marginLeft: {lg:"723px",sm:"40%"}, marginTop: {lg:"-41.5%",sm:"-69%"} }} src={board} />

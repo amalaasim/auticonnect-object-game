@@ -5,6 +5,7 @@ import board from '../assests/board.png';
 import { useEffect,useRef,useState } from 'react';
 import bg from '../assests/greenbg.png';
 import newgif from '../assests/he.gif';
+import standinglion from '../assests/standinglion.gif';
 import brown from '../assests/brown_board.png';
 import full from '../assests/carr.png';
 import half from '../assests/bluecar.png';
@@ -449,10 +450,15 @@ function Learnobjcar() {
 const playAndWait = (audio) => {
   return new Promise((resolve) => {
     if (!audio || sequenceCancelRef.current) {
+      setIsLionSpeaking(false);
       resolve();
       return;
     }
-    audio.onended = () => resolve();
+    setIsLionSpeaking(true);
+    audio.onended = () => {
+      setIsLionSpeaking(false);
+      resolve();
+    };
     audio.play().catch(() => console.log("Autoplay blocked"));
   });
 };
@@ -461,6 +467,7 @@ const playAndWait = (audio) => {
   const [audioFinished, setAudioFinished] = useState(false);
   const [speechVerified, setSpeechVerified] = useState(false);
   const [speechStatus, setSpeechStatus] = useState("");
+  const [isLionSpeaking, setIsLionSpeaking] = useState(false);
   const speechVerifiedRef = useRef(false);
   const [speechStep, setSpeechStep] = useState(1);
 
@@ -632,6 +639,7 @@ const playAndWait = (audio) => {
       setAudioFinished(false);
       setSpeechVerified(false);
       setSpeechStatus("");
+      setIsLionSpeaking(false);
       setSpeechStep(1);
       autoAdvanceRef.current = false;
       audio1Ref.current.pause();
@@ -667,8 +675,10 @@ const playAndWait = (audio) => {
       if (sequenceCancelRef.current) return;
 
       currentAudioRef.current = null;
+      setIsLionSpeaking(false);
       setAudioFinished(true);
     } catch (e) {
+      setIsLionSpeaking(false);
       console.log("Audio error", e);
     }
   };
@@ -746,6 +756,7 @@ const handleStop = () => {
   currentAudioRef.current = null;
   setSpeechVerified(false);
   setSpeechStatus("Stopped");
+  setIsLionSpeaking(false);
   setAudioFinished(false);
 };
 
@@ -917,7 +928,7 @@ opacity:"0.9",
              {t("repeatAfterMeCar")}
               </Typography> 
               </Box>
-          <Box component='img' sx={{ width: { lg: "450.59px",sm:"50%" }, height: {lg:"390.96px",sm:"52vh"}, marginTop: "-8px", marginLeft: {lg:"150px",sm:"-3%"}, borderRadius: "200.58px" }} src={newgif} />
+          <Box component='img' sx={{ width: { lg: "450.59px",sm:"50%" }, height: {lg:"390.96px",sm:"52vh"}, marginTop: "-8px", marginLeft: {lg:"150px",sm:"-3%"}, borderRadius: "200.58px" }} src={isLionSpeaking ? newgif : standinglion} />
         </Box>
 
         <Box component='img' sx={{ width: {lg:"658.94px",sm:"60%"}, height: {lg:"481px",sm:"40%"}, borderRadius: "44.5px", marginLeft: {lg:"723px",sm:"40%"}, marginTop: {lg:"-40.5%",sm:"-69%"} }} src={board} />

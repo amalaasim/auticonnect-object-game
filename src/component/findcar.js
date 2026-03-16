@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Box,Typography } from '@mui/material';
 import learnbg from '../assests/learn_bg.png';
 import cartoon from '../assests/finalgif.gif';
+import standinglion from '../assests/standinglion.gif';
 import board from '../assests/findbg.png';
 import car from '../assests/carr.png';
 import { useEffect, useRef } from "react";
@@ -33,6 +34,7 @@ function Findcar() {
   const [selectedImageSrc, setSelectedImageSrc] = React.useState(null);
   const [cameraAllowed, setCameraAllowed] = React.useState(true);
   const [selectionRecorded, setSelectionRecorded] = React.useState(false);
+  const [isLionSpeaking, setIsLionSpeaking] = React.useState(false);
 const audioRef = useRef(null);
 
   const yesAudioRef = useRef(null);
@@ -55,6 +57,24 @@ const noAudioRef = useRef(null);
       ["none", 0]
     )[0];
   }, [emotionCounts]);
+
+  const playTrackedAudio = React.useCallback((audio, options = {}) => {
+    const { onEnded, onError, resetTime = false } = options;
+    if (!audio) return;
+    if (resetTime) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    audio.onended = () => {
+      setIsLionSpeaking(false);
+      if (onEnded) onEnded();
+    };
+    setIsLionSpeaking(true);
+    audio.play().catch(() => {
+      setIsLionSpeaking(false);
+      if (onError) onError();
+    });
+  }, []);
 
 useEffect(() => {
   let permissionStatus = null;
@@ -82,14 +102,17 @@ useEffect(() => {
 useEffect(() => {
   const audio = audioRef.current;
   if (audio) {
-    audio.pause();
-    audio.currentTime = 0;
     audio.volume = 1;
-    audio.play().catch(() => {
-      setTimeout(() => audio.play().catch(() => {}), 1000);
+    playTrackedAudio(audio, {
+      resetTime: true,
+      onError: () => {
+        setTimeout(() => {
+          playTrackedAudio(audio);
+        }, 1000);
+      },
     });
   }
-}, [i18n.language]);
+}, [i18n.language, playTrackedAudio]);
 
   useEffect(() => {
   const done = localStorage.getItem("car_select_done");
@@ -172,14 +195,18 @@ useEffect(() => {
     }
     // Ball selected → play YES audio then navigate after 2 sec
     yesAudioRef.current.volume = 1;
-    yesAudioRef.current.play().catch(() => console.log("Yes autoplay blocked"));
+    playTrackedAudio(yesAudioRef.current, {
+      onError: () => console.log("Yes autoplay blocked"),
+    });
     setTimeout(() => {
       navigate("/final", { state: { from: "findcar" } });
     }, 5000);
   } else {
     // Car or Cookie selected → play NO audio
     noAudioRef.current.volume = 1;
-    noAudioRef.current.play().catch(() => console.log("No autoplay blocked"));
+    playTrackedAudio(noAudioRef.current, {
+      onError: () => console.log("No autoplay blocked"),
+    });
   }
 };
   return (
@@ -355,7 +382,7 @@ useEffect(() => {
           {/* cartoon */}
           <Box
             component="img"
-            src={cartoon}
+            src={isLionSpeaking ? cartoon : standinglion}
             sx={{
               width: { lg: "402px", sm: "270px" },
               height: { lg: "402px", sm: "290px" },

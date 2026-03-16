@@ -6,6 +6,7 @@ import brown from '../assests/brown_board.png';
 import bg from '../assests/greenbg.png';
 import { useEffect, useRef } from "react";
 import newgif from '../assests/finalgif.gif';
+import standinglion from '../assests/standinglion.gif';
 import stop from '../assests/stop.png';
 import pause from '../assests/pause.png';
 import retry from '../assests/retry.png';
@@ -27,14 +28,21 @@ export default function Ball() {
 const audioRef = useRef(null);
 const recognitionRef = useRef(null);
 const retryListenRef = useRef(null);
+const [isLionSpeaking, setIsLionSpeaking] = React.useState(false);
 const playAndWait = (audio) => {
   return new Promise((resolve) => {
     if (!audio) {
+      setIsLionSpeaking(false);
       resolve();
       return;
     }
-    audio.onended = () => resolve();
+    setIsLionSpeaking(true);
+    audio.onended = () => {
+      setIsLionSpeaking(false);
+      resolve();
+    };
     audio.play().catch(() => {
+      setIsLionSpeaking(false);
       setTimeout(() => {
         audio.play().catch(() => console.log("Autoplay blocked"));
       }, 1000);
@@ -65,6 +73,7 @@ useEffect(() => {
 useEffect(() => {
   const listenForBall = () =>
     new Promise((resolve, reject) => {
+      const targetWord = i18n.language === "ur" ? "gaind" : "ball";
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -75,7 +84,7 @@ useEffect(() => {
       }
 
       const recognition = new SpeechRecognition();
-      recognition.lang = i18n.language === "ur" ? "ur-PK" : "en-US";
+      recognition.lang = "en-US";
       recognition.interimResults = true;
       recognition.maxAlternatives = 5;
       recognition.continuous = false;
@@ -86,7 +95,7 @@ useEffect(() => {
           retryListenRef.current = null;
         }
         setSpeechVerified(false);
-        setSpeechStatus("Listening… say “ball”");
+        setSpeechStatus(`Listening… say “${targetWord}”`);
         try {
           recognition.start();
         } catch (_) {}
@@ -104,12 +113,16 @@ useEffect(() => {
           "bawl",
           "bol",
           "baal",
-          "baul",
-          "bahl",
           "gaind",
           "gaen",
           "gain",
           "gand",
+          "gaindh",
+          "gainda",
+          "gaynd",
+          "gayn",
+          "ghaind",
+          "ghaenda",
           "گیند",
           "گیندا",
         ];
@@ -125,10 +138,13 @@ useEffect(() => {
           }
 
           return words.some((word) => {
-            if (word.length > 5) return false;
+            if (word.length > 7) return false;
             if (/^ba/.test(word)) return true;
             if (/^bo/.test(word)) return true;
-            if (/^ga/i.test(word)) return true;
+            if (/^gai/.test(word)) return true;
+            if (/^gay/.test(word)) return true;
+            if (/^gha/.test(word)) return true;
+            if (/^گی/.test(word)) return true;
             return false;
           });
         });
@@ -136,7 +152,7 @@ useEffect(() => {
         if (matches) {
           setSpeechVerified(true);
           speechVerifiedRef.current = true;
-          setSpeechStatus("Great! You said ball.");
+          setSpeechStatus(`Great! You said ${targetWord}.`);
           if (retryListenRef.current) {
             clearTimeout(retryListenRef.current);
             retryListenRef.current = null;
@@ -146,7 +162,7 @@ useEffect(() => {
         } else {
           setSpeechVerified(false);
           speechVerifiedRef.current = false;
-          setSpeechStatus("Try again: say “ball”.");
+          setSpeechStatus(`Try again: say “${targetWord}”.`);
         }
       };
 
@@ -180,6 +196,7 @@ useEffect(() => {
       if (!audio) return;
       setSpeechVerified(false);
       setSpeechStatus("");
+      setIsLionSpeaking(false);
       audio.pause();
       audio.currentTime = 0;
       audio.volume = 1;
@@ -200,6 +217,7 @@ useEffect(() => {
     try {
       recognitionRef.current?.stop();
     } catch (_) {}
+    setIsLionSpeaking(false);
   };
 }, [i18n.language]);
   // Get uploaded image from localStorage or navigation state
@@ -325,7 +343,11 @@ useEffect(() => {
                 },
                 marginTop: {lg: i18n.language === "ur" ? "-8.3%" :"-9%",sm: i18n.language === "ur" ? "-14.8%" :"-15.5%"},
                 marginLeft:{lg: i18n.language === "ur" ? "25.1%" :"26%",sm: i18n.language === "ur" ? "19%" :"18%"},
-                width:{lg:i18n.language==="ur"?"15%":"10%",sm:i18n.language==="ur"?"25%":"20%"},
+                width:{
+                  lg: i18n.language === "ur" ? "20%" : "10%",
+                  sm: i18n.language === "ur" ? "35%" : "20%",
+                },
+                whiteSpace: i18n.language === "ur" ? "nowrap" : "normal",
                 fontFamily:
                   i18n.language === "ur"
                     ? "JameelNooriNastaleeq"
@@ -336,7 +358,7 @@ useEffect(() => {
               {t("yourball")}
             </Typography>
 
-            <Box component="img" src={newgif} sx={{ width:{lg:"390px",sm:"56%"}, ml: {lg:"150px",sm:"-10%"},mt:{lg:"-2%",sm:"0%"} }} />
+            <Box component="img" src={isLionSpeaking ? newgif : standinglion} sx={{ width:{lg:"390px",sm:"56%"}, ml: {lg:"150px",sm:"-10%"},mt:{lg:"-2%",sm:"0%"} }} />
           </Box>
 
           <Box component="img" src={board} sx={{ width: {lg:"659px",sm:"52%"}, ml: {lg:"723px",sm:"45%"}, mt: {lg:"-41%",sm:"-57%"} }} />

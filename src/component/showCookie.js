@@ -6,6 +6,7 @@ import brown from '../assests/brown_board.png';
 import bg from '../assests/greenbg.png';
 import { useEffect, useRef } from "react";
 import newgif from '../assests/finalgif.gif';
+import standinglion from '../assests/standinglion.gif';
 import stop from '../assests/stop.png';
 import pause from '../assests/pause.png';
 import retry from '../assests/retry.png';
@@ -31,15 +32,22 @@ const cancelListenRef = useRef(false);
 const allowListeningRef = useRef(true);
 const [speechVerified, setSpeechVerified] = React.useState(false);
 const [speechStatus, setSpeechStatus] = React.useState("");
+const [isLionSpeaking, setIsLionSpeaking] = React.useState(false);
 const speechVerifiedRef = useRef(false);
 const playAndWait = (audio) => {
   return new Promise((resolve) => {
     if (!audio) {
+      setIsLionSpeaking(false);
       resolve();
       return;
     }
-    audio.onended = () => resolve();
+    setIsLionSpeaking(true);
+    audio.onended = () => {
+      setIsLionSpeaking(false);
+      resolve();
+    };
     audio.play().catch(() => {
+      setIsLionSpeaking(false);
       setTimeout(() => {
         audio.play().catch(() => console.log("Autoplay blocked"));
       }, 1000);
@@ -231,6 +239,7 @@ useEffect(() => {
     cancelListenRef.current = false;
     setSpeechVerified(false);
     setSpeechStatus("");
+    setIsLionSpeaking(false);
     audio.pause();
     audio.currentTime = 0;
     audio.volume = 1;
@@ -250,6 +259,7 @@ useEffect(() => {
       retryListenRef.current = null;
     }
     if (audioRef.current) audioRef.current.onended = null;
+    setIsLionSpeaking(false);
     try {
       recognitionRef.current?.stop();
     } catch (_) {}
@@ -395,7 +405,7 @@ useEffect(() => {
               {t("yourcook")}
             </Typography>
 
-            <Box component="img" src={newgif} sx={{ width:{lg:"370px",sm:"40%"}, ml: {lg:"150px",sm:"-5%"} }} />
+            <Box component="img" src={isLionSpeaking ? newgif : standinglion} sx={{ width:{lg:"370px",sm:"40%"}, ml: {lg:"150px",sm:"-5%"} }} />
           </Box>
 
           <Box component="img" src={board} sx={{ width: {lg:"659px",sm:"52%"}, ml: {lg:"723px",sm:"45%"}, mt: {lg:"-43%",sm:"-57%"} }} />

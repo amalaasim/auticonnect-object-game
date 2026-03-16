@@ -32,7 +32,7 @@ function Wonderworld() {
   const audioRef = useRef(null);
 
   // TODO: Replace with DB-backed "most recent stars" once the API is attached.
-  const getRecentStars = () => {
+  const getRecentStars = React.useCallback(() => {
     const fallback = { cookie: 2, car: 3, shoe: 1, ball: 2 };
     if (typeof window === "undefined") return fallback;
     try {
@@ -43,9 +43,8 @@ function Wonderworld() {
     } catch {
       return fallback;
     }
-  };
-
-  const recentStars = getRecentStars();
+  }, []);
+  const [recentStars, setRecentStars] = React.useState(() => getRecentStars());
   const starFor = (count) => {
     if (count === 1) return star;
     if (count === 2) return star2;
@@ -53,6 +52,21 @@ function Wonderworld() {
     return null;
   };
   const starOffsetY = (count) => (count === 3 ? "38px" : "0px");
+
+useEffect(() => {
+  const refreshStars = () => {
+    setRecentStars(getRecentStars());
+  };
+
+  refreshStars();
+  window.addEventListener("focus", refreshStars);
+  document.addEventListener("visibilitychange", refreshStars);
+
+  return () => {
+    window.removeEventListener("focus", refreshStars);
+    document.removeEventListener("visibilitychange", refreshStars);
+  };
+}, [getRecentStars]);
 
 useEffect(() => {
   const audio = audioRef.current;
