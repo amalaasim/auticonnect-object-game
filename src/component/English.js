@@ -23,6 +23,9 @@ import { motion } from "framer-motion";
 export default function English() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const openSheruBot = () => {
+    window.location.href = "/sheru-bot/index.html";
+  };
 
   return (
  <motion.div
@@ -119,7 +122,7 @@ paddingTop:"2.3%",paddingLeft:"5%",paddingBottom:"2.6%",height:"auto",borderRadi
             </Box>
 
             {/* Social Storyland */}
-            <Box sx={{ display: "flex", flexDirection: "column", opacity: "0.9","&:hover": {
+            <Box onClick={() => navigate("/garden")} sx={{ display: "flex", flexDirection: "column", opacity: "0.9", cursor: "pointer","&:hover": {
                   transform: "scale(1.08)",
                   boxShadow: "0 10px 25px rgba(0,0,0,0)",
                 }, }}>
@@ -176,8 +179,13 @@ paddingTop:"2.3%",paddingLeft:"5%",height:"auto",borderRadius:"20px"}}>
           </Typography>
         </Box>
 
-       <Box  component="img" src={play} sx={{width:{lg:"190px",sm:"120px"},height:"90px",marginLeft:{lg:"60%",sm:"55%"},paddingLeft:"6%",marginRight:{lg:i18n.language === "ur" ? "65%" : "0%",sm:i18n.language === "ur" ? "55%" : "0%"},
-       marginTop:{lg: i18n.language === "ur" ?"-11%":"-8%",sm: i18n.language === "ur" ?"-18%":"-35%"}}}/>
+       <Box
+        component="img"
+        src={play}
+        onClick={openSheruBot}
+        sx={{width:{lg:"190px",sm:"120px"},height:"90px",marginLeft:{lg:"60%",sm:"55%"},paddingLeft:"6%",marginRight:{lg:i18n.language === "ur" ? "65%" : "0%",sm:i18n.language === "ur" ? "55%" : "0%"},
+       marginTop:{lg: i18n.language === "ur" ?"-11%":"-8%",sm: i18n.language === "ur" ?"-18%":"-35%"}, cursor: "pointer"}}
+      />
        <Box  component="img" src={cartoon} sx={{width:{lg:"32%",sm:"235%"},height:"43%", marginLeft:"66%",marginRight:{lg:i18n.language === "ur" ? "70%" : "0%",sm:i18n.language === "ur" ? "65%" : "0%"},paddingLeft:"6%",marginTop:{lg: i18n.language === "ur" ?"-18%":"-16%",sm: i18n.language === "ur" ?"-24%":"-35%"},}}/>
        </Box>
        </Box>

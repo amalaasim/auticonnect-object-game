@@ -1,41 +1,59 @@
-import { defineConfig, transformWithEsbuild } from "vite";
+import { defineConfig, loadEnv, transformWithEsbuild } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig({
-  assetsInclude: ["**/*.mpeg"],
-  plugins: [
-    {
-      name: "jsx-in-js",
-      async transform(code, id) {
-        if (!id.includes("/src/") || !id.endsWith(".js")) {
-          return null;
-        }
+export default defineConfig(({ mode }) => {
+  const rootEnv = loadEnv(mode, process.cwd(), "");
+  const sheruEnv = loadEnv(mode, "./sheru-bot", "");
+  const geminiApiKey =
+    rootEnv.VITE_GEMINI_API_KEY ||
+    rootEnv.GEMINI_API_KEY ||
+    sheruEnv.VITE_GEMINI_API_KEY ||
+    sheruEnv.GEMINI_API_KEY ||
+    "";
 
-        return transformWithEsbuild(code, id, {
-          loader: "jsx",
-          jsx: "automatic"
-        });
-      }
+  return {
+    assetsInclude: ["**/*.mpeg"],
+    define: {
+      "import.meta.env.GEMINI_API_KEY": JSON.stringify(geminiApiKey),
+      "import.meta.env.VITE_GEMINI_API_KEY": JSON.stringify(geminiApiKey),
+      "process.env.API_KEY": JSON.stringify(geminiApiKey),
+      "process.env.GEMINI_API_KEY": JSON.stringify(geminiApiKey),
     },
-    react()
-  ],
-  optimizeDeps: {
-    esbuildOptions: {
-      loader: {
-        ".js": "jsx"
-      }
-    }
-  },
-  server: {
-    host: "0.0.0.0",
-    port: 3000
-  },
-  preview: {
-    host: "0.0.0.0",
-    port: 3000
-  },
-  test: {
-    environment: "jsdom",
-    setupFiles: "./src/setupTests.js"
-  }
+    plugins: [
+      {
+        name: "jsx-in-js",
+        async transform(code, id) {
+          if (!id.includes("/src/") || !id.endsWith(".js")) {
+            return null;
+          }
+
+          return transformWithEsbuild(code, id, {
+            loader: "jsx",
+            jsx: "automatic",
+          });
+        },
+      },
+      react(),
+    ],
+    optimizeDeps: {
+      esbuildOptions: {
+        loader: {
+          ".js": "jsx",
+        },
+      },
+    },
+    server: {
+      host: "0.0.0.0",
+      port: 3000,
+    },
+    preview: {
+      host: "0.0.0.0",
+      port: 3000,
+    },
+    test: {
+      environment: "jsdom",
+      globals: true,
+      setupFiles: "./src/setupTests.js",
+    },
+  };
 });

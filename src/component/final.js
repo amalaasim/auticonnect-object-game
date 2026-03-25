@@ -282,48 +282,51 @@ function Final() {
           />
 
           {/* try button */}
-<Box
-  sx={{ position: "relative" }} // wrapper to keep layout
->
-  <Box
-    component="img"
-    src={trybutton}
-    onClick={handleTry} // click now works
-    sx={{
-      width: { lg: "150px", sm: "120px" },
-      height: { lg: "70px", sm: "55px" },
-      marginTop: { lg: "-36.5%", sm: "-48%" },
-            marginLeft: { lg: "65%", sm: "66%" },
-      cursor: `url(${click}) 12 12, auto`,
-     
-    }}
-  />
+          <Box
+            onClick={handleTry}
+            sx={{
+              position: "relative",
+              width: { lg: "180px", sm: "150px" },
+              height: { lg: "92px", sm: "72px" },
+              marginTop: { lg: "calc(-36.5% + 230px)", sm: "calc(-48% + 230px)" },
+              marginLeft: { lg: "calc(64.3% - 10px)", sm: "calc(64.5% - 10px)" },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: `url(${click}) 12 12, auto`,
+              zIndex: 3,
+            }}
+          >
+            <Box
+              component="img"
+              src={trybutton}
+              sx={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                pointerEvents: "none",
+              }}
+            />
 
-  <Typography
-    // click now works
-    sx={{
-      fontSize: {
-        lg: i18n.language === "ur" ? "37px" : "27px",
-        sm: i18n.language === "ur" ? "28px" : "24px",
-      },
-      marginLeft: {
-        lg: i18n.language === "ur" ? "66.3%" : "66.3%",
-        sm: i18n.language === "ur" ? "68.2%" : "67%",
-      },
-      marginTop: {
-        lg: "-21%",
-        sm: i18n.language === "ur" ? "-28.5%" : "-27.8%",
-      },
-      fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" : "Chewy",
-      color: "rgba(255, 203, 143, 1)",
-      cursor: `url(${click}) 12 12, auto`,
-            "&:hover": { transform: "scale(1.0)" },
-
-    }}
-  >
-    {t("try")}
-  </Typography>
-</Box>
+            <Typography
+              sx={{
+                position: "relative",
+                fontSize: {
+                  lg: i18n.language === "ur" ? "37px" : "27px",
+                  sm: i18n.language === "ur" ? "28px" : "24px",
+                },
+                fontFamily: i18n.language === "ur" ? "JameelNooriNastaleeq" : "Chewy",
+                color: "rgba(255, 203, 143, 1)",
+                cursor: `url(${click}) 12 12, auto`,
+                userSelect: "none",
+                zIndex: 1,
+              }}
+            >
+              {t("try")}
+            </Typography>
+          </Box>
 
 
           <Box
@@ -334,8 +337,10 @@ function Final() {
               width: { lg: "600px", sm: "380px" },
               height: { lg: "490px", sm: "310px" },
               marginLeft: { lg: "700px", sm: "45%" },
-              marginTop: { lg: "-41.5%", sm: "-69%" },
-              pointerEvents: "none"
+              marginTop: { lg: "calc(-41.5% + 110px)", sm: "calc(-69% + 110px)" },
+              pointerEvents: "none",
+              position: "relative",
+              zIndex: 1,
 
             }}
           />

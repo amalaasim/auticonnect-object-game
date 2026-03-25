@@ -15,6 +15,7 @@ import Findball from "./component/findball";
 import Final from "./component/final";
 import English from "./component/English";
 import Verifyshoe from "./component/shoeverify";
+import GardenStory from "./component/GardenStory";
 import voice from "./assests/audio_file.mpeg";
 import click from "./assests/click_Audio.wav";
 import { UploadShoe } from "./component/uploadshoe";
@@ -32,6 +33,7 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Lanuguage />} />
         <Route path="/english" element={<English />} />
+        <Route path="/garden" element={<GardenStory />} />
         <Route path="/wonderworld" element={<Wonderworld />} />
         <Route path="/learnobject" element={<Learnobj />} />
         <Route path="/learnobjectcar" element={<Learnobjcar />} />
